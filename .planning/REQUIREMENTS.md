@@ -76,37 +76,37 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CONV-01 | — | Pending |
-| CONV-02 | — | Pending |
-| CONV-03 | — | Pending |
-| CONV-04 | — | Pending |
-| CONV-05 | — | Pending |
-| SCAN-01 | — | Pending |
-| SCAN-02 | — | Pending |
-| SCAN-03 | — | Pending |
-| SCAN-04 | — | Pending |
-| SCAN-05 | — | Pending |
-| SCAN-06 | — | Pending |
-| SCAN-07 | — | Pending |
-| SCAN-08 | — | Pending |
-| SCAN-09 | — | Pending |
-| SNIP-01 | — | Pending |
-| SNIP-02 | — | Pending |
-| SNIP-03 | — | Pending |
-| KEYS-01 | — | Pending |
-| KEYS-02 | — | Pending |
-| KEYS-03 | — | Pending |
-| SETT-01 | — | Pending |
-| SETT-02 | — | Pending |
-| PLAT-01 | — | Pending |
-| PLAT-02 | — | Pending |
-| PLAT-03 | — | Pending |
+| CONV-01 | Phase 4 | Pending |
+| CONV-02 | Phase 4 | Pending |
+| CONV-03 | Phase 4 | Pending |
+| CONV-04 | Phase 4 | Pending |
+| CONV-05 | Phase 4 | Pending |
+| SCAN-01 | Phase 2 | Pending |
+| SCAN-02 | Phase 2 | Pending |
+| SCAN-03 | Phase 5 | Pending |
+| SCAN-04 | Phase 2 | Pending |
+| SCAN-05 | Phase 2 | Pending |
+| SCAN-06 | Phase 5 | Pending |
+| SCAN-07 | Phase 2 | Pending |
+| SCAN-08 | Phase 2 | Pending |
+| SCAN-09 | Phase 5 | Pending |
+| SNIP-01 | Phase 5 | Pending |
+| SNIP-02 | Phase 5 | Pending |
+| SNIP-03 | Phase 5 | Pending |
+| KEYS-01 | Phase 3 | Pending |
+| KEYS-02 | Phase 3 | Pending |
+| KEYS-03 | Phase 3 | Pending |
+| SETT-01 | Phase 3 | Pending |
+| SETT-02 | Phase 3 | Pending |
+| PLAT-01 | Phase 1 | Pending |
+| PLAT-02 | Phase 1 | Pending |
+| PLAT-03 | Phase 6 | Pending |
 
 **Coverage:**
 - v1 requirements: 25 total
-- Mapped to phases: 0
-- Unmapped: 25 ⚠️
+- Mapped to phases: 25
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-19*
-*Last updated: 2026-02-19 after initial definition*
+*Last updated: 2026-02-19 after roadmap creation — all 25 requirements mapped*
