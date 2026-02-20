@@ -13,7 +13,7 @@
 
 import { onMessage } from '@/utils/messaging';
 import { findInvisibleChars, type ScanFinding } from '@/utils/scanner';
-import { highlightColorSetting, sensitivitySetting, scanModeSetting, snippetsSetting } from '@/utils/storage';
+import { tagsColorSetting, zerowColorSetting, watermarkColorSetting, sensitivitySetting, scanModeSetting, snippetsSetting } from '@/utils/storage';
 import type { Snippet } from '@/utils/types';
 
 /** Tags to skip when walking the DOM */
@@ -25,15 +25,19 @@ const SKIP_TAGS = new Set([
   'TEXTAREA',
 ]);
 
-/** Default highlight color (matches storage default) */
-const DEFAULT_HIGHLIGHT_COLOR = '#ffeb3b';
-
-/** Per-class highlight colors for visual distinction */
+/** Per-class highlight colors for visual distinction (fallback defaults) */
 const CLASS_COLORS: Record<string, string> = {
   tags: '#FFEB3B',      // Yellow — Tags block encoded messages
   zerowidth: '#FF9800', // Orange — Zero-width invisible chars
   watermark: '#E91E63', // Pink/Magenta — AI watermark indicators
 };
+
+/** Per-class color settings from user preferences */
+interface ClassColors {
+  tags: string;
+  zerowidth: string;
+  watermark: string;
+}
 
 /** Module-level state */
 let observer: MutationObserver | null = null;
@@ -68,7 +72,7 @@ function createScanWalker(root: Node): TreeWalker {
 function highlightFindings(
   textNode: Text,
   findings: ScanFinding[],
-  color: string | null,
+  classColors: ClassColors,
 ): void {
   // Sort by start position descending so we process from end to beginning
   const sorted = [...findings].sort((a, b) => b.start - a.start);
@@ -85,8 +89,9 @@ function highlightFindings(
     span.setAttribute('data-iu-original', finding.original);
     span.setAttribute('data-iu-type', finding.type);
     span.textContent = finding.replacement;
-    // null = per-class colors; string = user custom color
-    span.style.backgroundColor = color ?? CLASS_COLORS[finding.type] ?? DEFAULT_HIGHLIGHT_COLOR;
+    // Use per-class color from settings, falling back to hardcoded defaults
+    const colorKey = finding.type as keyof ClassColors;
+    span.style.backgroundColor = classColors[colorKey] ?? CLASS_COLORS[finding.type] ?? '#FFEB3B';
     span.style.borderRadius = '2px';
     span.style.padding = '0 2px';
     span.style.fontFamily = 'monospace';
@@ -120,21 +125,21 @@ function clearAllHighlights(): void {
  * Scan a single text node and apply highlights if findings exist.
  * Returns the findings array for accumulation in allFindings.
  */
-function scanTextNode(textNode: Text, color: string | null, sensitivity: import('@/utils/charsets').SensitivityLevel = 'standard'): ScanFinding[] {
+function scanTextNode(textNode: Text, classColors: ClassColors, sensitivity: import('@/utils/charsets').SensitivityLevel = 'standard'): ScanFinding[] {
   const text = textNode.textContent;
   if (!text) return [];
 
   const findings = findInvisibleChars(text, sensitivity);
   if (findings.length === 0) return [];
 
-  highlightFindings(textNode, findings, color);
+  highlightFindings(textNode, findings, classColors);
   return findings;
 }
 
 /**
  * Start observing DOM mutations to scan dynamically added content.
  */
-function startObserving(color: string | null, sensitivity: import('@/utils/charsets').SensitivityLevel = 'standard'): void {
+function startObserving(classColors: ClassColors, sensitivity: import('@/utils/charsets').SensitivityLevel = 'standard'): void {
   if (observer) return;
 
   let pendingNodes: Node[] = [];
@@ -147,14 +152,14 @@ function startObserving(color: string | null, sensitivity: import('@/utils/chars
 
     for (const node of nodes) {
       if (node.nodeType === Node.TEXT_NODE) {
-        const findings = scanTextNode(node as Text, color, sensitivity);
+        const findings = scanTextNode(node as Text, classColors, sensitivity);
         totalFindings += findings.length;
         allFindings.push(...findings);
       } else if (node.nodeType === Node.ELEMENT_NODE) {
         const walker = createScanWalker(node);
         let textNode: Node | null;
         while ((textNode = walker.nextNode())) {
-          const findings = scanTextNode(textNode as Text, color, sensitivity);
+          const findings = scanTextNode(textNode as Text, classColors, sensitivity);
           totalFindings += findings.length;
           allFindings.push(...findings);
         }
@@ -205,10 +210,12 @@ function stopObserving(): void {
  * Perform a full page scan: walk the DOM, find invisible chars, highlight them.
  */
 async function performFullScan(): Promise<{ count: number }> {
-  const userColor = await highlightColorSetting.getValue();
+  const tagsColor = await tagsColorSetting.getValue();
+  const zerowColor = await zerowColorSetting.getValue();
+  const watermarkColor = await watermarkColorSetting.getValue();
   const sensitivity = await sensitivitySetting.getValue();
-  // If user has custom color (not the default), use it for all classes; otherwise per-class
-  const color = userColor.toLowerCase() === DEFAULT_HIGHLIGHT_COLOR ? null : userColor;
+  const classColors: ClassColors = { tags: tagsColor, zerowidth: zerowColor, watermark: watermarkColor };
+
   scanActive = true;
   totalFindings = 0;
   allFindings = [];
@@ -223,13 +230,13 @@ async function performFullScan(): Promise<{ count: number }> {
   }
 
   for (const textNode of textNodes) {
-    const findings = scanTextNode(textNode, color, sensitivity);
+    const findings = scanTextNode(textNode, classColors, sensitivity);
     totalFindings += findings.length;
     allFindings.push(...findings);
   }
 
   // Start observing for dynamic content
-  startObserving(color, sensitivity);
+  startObserving(classColors, sensitivity);
 
   return { count: totalFindings };
 }
@@ -304,21 +311,20 @@ export default defineContentScript({
       }
     });
 
-    // Reactively update highlight color when setting changes (SETT-01)
-    highlightColorSetting.watch((newColor) => {
-      const isDefault = newColor.toLowerCase() === DEFAULT_HIGHLIGHT_COLOR;
-      const highlights =
-        document.querySelectorAll<HTMLElement>('[data-iu-highlight]');
-      for (const el of highlights) {
-        if (isDefault) {
-          // Restore per-class colors
-          const type = el.getAttribute('data-iu-type') ?? 'zerowidth';
-          el.style.backgroundColor = CLASS_COLORS[type] ?? DEFAULT_HIGHLIGHT_COLOR;
-        } else {
-          // Custom color overrides all classes
-          el.style.backgroundColor = newColor;
-        }
-      }
+    // Reactively update highlight colors per class when settings change
+    tagsColorSetting.watch((newColor) => {
+      document.querySelectorAll<HTMLElement>('[data-iu-highlight][data-iu-type="tags"]')
+        .forEach(el => { el.style.backgroundColor = newColor; });
+    });
+
+    zerowColorSetting.watch((newColor) => {
+      document.querySelectorAll<HTMLElement>('[data-iu-highlight][data-iu-type="zerowidth"]')
+        .forEach(el => { el.style.backgroundColor = newColor; });
+    });
+
+    watermarkColorSetting.watch((newColor) => {
+      document.querySelectorAll<HTMLElement>('[data-iu-highlight][data-iu-type="watermark"]')
+        .forEach(el => { el.style.backgroundColor = newColor; });
     });
   },
 });

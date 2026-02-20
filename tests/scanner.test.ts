@@ -117,7 +117,7 @@ describe('findInvisibleChars', () => {
 
     expect(findings).toHaveLength(1);
     expect(findings[0].type).toBe('zerowidth');
-    expect(findings[0].replacement).toBe('[U+200B]');
+    expect(findings[0].replacement).toBe('[Zero Width Space U+200B]');
     expect(findings[0].start).toBe(1);
     expect(findings[0].end).toBe(2);
     expect(findings[0].original).toBe('\u200B');
@@ -128,7 +128,7 @@ describe('findInvisibleChars', () => {
     const findings = findInvisibleChars(text);
 
     expect(findings).toHaveLength(1);
-    expect(findings[0].replacement).toBe('[U+200C]');
+    expect(findings[0].replacement).toBe('[Zero Width Non-Joiner U+200C]');
     expect(findings[0].type).toBe('zerowidth');
   });
 
@@ -137,7 +137,7 @@ describe('findInvisibleChars', () => {
     const findings = findInvisibleChars(text);
 
     expect(findings).toHaveLength(1);
-    expect(findings[0].replacement).toBe('[U+200D]');
+    expect(findings[0].replacement).toBe('[Zero Width Joiner U+200D]');
     expect(findings[0].type).toBe('zerowidth');
   });
 
@@ -146,7 +146,7 @@ describe('findInvisibleChars', () => {
     const findings = findInvisibleChars(text);
 
     expect(findings).toHaveLength(1);
-    expect(findings[0].replacement).toBe('[U+FEFF]');
+    expect(findings[0].replacement).toBe('[BOM U+FEFF]');
     expect(findings[0].type).toBe('zerowidth');
   });
 
@@ -155,7 +155,7 @@ describe('findInvisibleChars', () => {
     const findings = findInvisibleChars(text);
 
     expect(findings).toHaveLength(1);
-    expect(findings[0].replacement).toBe('[U+200E]');
+    expect(findings[0].replacement).toBe('[Left-to-Right Mark U+200E]');
     expect(findings[0].type).toBe('zerowidth');
   });
 
@@ -164,7 +164,7 @@ describe('findInvisibleChars', () => {
     const findings = findInvisibleChars(text);
 
     expect(findings).toHaveLength(1);
-    expect(findings[0].replacement).toBe('[U+200F]');
+    expect(findings[0].replacement).toBe('[Right-to-Left Mark U+200F]');
     expect(findings[0].type).toBe('zerowidth');
   });
 
@@ -179,7 +179,7 @@ describe('findInvisibleChars', () => {
     expect(findings.length).toBeGreaterThanOrEqual(3);
 
     // ZWS at index 5
-    const zwsFinding = findings.find((f) => f.replacement === '[U+200B]');
+    const zwsFinding = findings.find((f) => f.replacement === '[Zero Width Space U+200B]');
     expect(zwsFinding).toBeDefined();
     expect(zwsFinding!.start).toBe(5);
     expect(zwsFinding!.end).toBe(6);
@@ -191,7 +191,7 @@ describe('findInvisibleChars', () => {
     expect(tagsFinding!.start).toBe(6); // after "hello" + ZWS
 
     // ZWNJ at end
-    const zwnjFinding = findings.find((f) => f.replacement === '[U+200C]');
+    const zwnjFinding = findings.find((f) => f.replacement === '[Zero Width Non-Joiner U+200C]');
     expect(zwnjFinding).toBeDefined();
 
     // No overlapping ranges
@@ -232,7 +232,7 @@ describe('findInvisibleChars', () => {
 
     const thoroughFindings = findInvisibleChars(text, 'thorough');
     expect(thoroughFindings).toHaveLength(1);
-    expect(thoroughFindings[0].replacement).toBe('[U+2060]');
+    expect(thoroughFindings[0].replacement).toBe('[Word Joiner U+2060]');
   });
 
   it('paranoid sensitivity detects directional overrides (U+202A-202E)', () => {
@@ -255,7 +255,7 @@ describe('findInvisibleChars', () => {
 
     const paranoidFindings = findInvisibleChars(text, 'paranoid');
     expect(paranoidFindings).toHaveLength(1);
-    expect(paranoidFindings[0].replacement).toBe('[U+00AD]');
+    expect(paranoidFindings[0].replacement).toBe('[Soft Hyphen U+00AD]');
   });
 
   // --- Edge cases ---
@@ -287,8 +287,8 @@ describe('findInvisibleChars', () => {
     const findings = findInvisibleChars(text);
 
     expect(findings).toHaveLength(2);
-    expect(findings[0].replacement).toBe('[U+200B]');
-    expect(findings[1].replacement).toBe('[U+200C]');
+    expect(findings[0].replacement).toBe('[Zero Width Space U+200B]');
+    expect(findings[1].replacement).toBe('[Zero Width Non-Joiner U+200C]');
     expect(findings[0].end).toBeLessThanOrEqual(findings[1].start);
   });
 });
@@ -298,13 +298,13 @@ describe('findInvisibleChars', () => {
 // ---------------------------------------------------------------------------
 
 describe('watermark detection', () => {
-  it('classifies U+202F (NNBSP) as watermark with named label', () => {
+  it('classifies U+202F (NNBSP) as watermark with named label and Unicode code', () => {
     const text = 'hello\u202Fworld';
     const findings = findInvisibleChars(text);
 
     expect(findings).toHaveLength(1);
     expect(findings[0].type).toBe('watermark');
-    expect(findings[0].replacement).toBe('[Narrow No-Break Space]');
+    expect(findings[0].replacement).toBe('[Narrow No-Break Space U+202F]');
     expect(findings[0].start).toBe(5);
     expect(findings[0].end).toBe(6);
   });
@@ -315,7 +315,7 @@ describe('watermark detection', () => {
 
     expect(findings).toHaveLength(1);
     expect(findings[0].type).toBe('watermark');
-    expect(findings[0].replacement).toBe('[Em Space]');
+    expect(findings[0].replacement).toBe('[Em Space U+2003]');
   });
 
   it('keeps U+200B classified as zerowidth (not watermark)', () => {
@@ -324,7 +324,7 @@ describe('watermark detection', () => {
 
     expect(findings).toHaveLength(1);
     expect(findings[0].type).toBe('zerowidth');
-    expect(findings[0].replacement).toBe('[U+200B]');
+    expect(findings[0].replacement).toBe('[Zero Width Space U+200B]');
   });
 
   it('keeps Tags block characters classified as tags', () => {
@@ -350,22 +350,22 @@ describe('watermark detection', () => {
 
     const zwFinding = findings.find((f) => f.type === 'zerowidth');
     expect(zwFinding).toBeDefined();
-    expect(zwFinding!.replacement).toBe('[U+200B]');
+    expect(zwFinding!.replacement).toBe('[Zero Width Space U+200B]');
 
     const wmFinding = findings.find((f) => f.type === 'watermark');
     expect(wmFinding).toBeDefined();
-    expect(wmFinding!.replacement).toBe('[Narrow No-Break Space]');
+    expect(wmFinding!.replacement).toBe('[Narrow No-Break Space U+202F]');
   });
 
-  it('uses named labels from AI_WATERMARK_CHARS (not hex codes)', () => {
-    // Test all 6 watermark characters have named labels
+  it('uses named labels with Unicode codes from AI_WATERMARK_CHARS', () => {
+    // Test all 6 watermark characters have named labels with Unicode codes
     const watermarks = [
-      { char: '\u202F', label: '[Narrow No-Break Space]' },
-      { char: '\u2003', label: '[Em Space]' },
-      { char: '\u2002', label: '[En Space]' },
-      { char: '\u2009', label: '[Thin Space]' },
-      { char: '\u200A', label: '[Hair Space]' },
-      { char: '\u205F', label: '[Medium Mathematical Space]' },
+      { char: '\u202F', label: '[Narrow No-Break Space U+202F]' },
+      { char: '\u2003', label: '[Em Space U+2003]' },
+      { char: '\u2002', label: '[En Space U+2002]' },
+      { char: '\u2009', label: '[Thin Space U+2009]' },
+      { char: '\u200A', label: '[Hair Space U+200A]' },
+      { char: '\u205F', label: '[Medium Mathematical Space U+205F]' },
     ];
 
     for (const { char, label } of watermarks) {

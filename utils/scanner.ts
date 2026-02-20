@@ -69,6 +69,25 @@ function isTagsBlock(cp: number): boolean {
   return cp >= TAGS_BLOCK_START && cp <= TAGS_BLOCK_END;
 }
 
+/** Human-readable names for common zero-width characters */
+const ZEROWIDTH_NAMES: ReadonlyMap<number, string> = new Map([
+  [0x200B, 'Zero Width Space'],
+  [0x200C, 'Zero Width Non-Joiner'],
+  [0x200D, 'Zero Width Joiner'],
+  [0x200E, 'Left-to-Right Mark'],
+  [0x200F, 'Right-to-Left Mark'],
+  [0xFEFF, 'BOM'],
+  [0x2060, 'Word Joiner'],
+  [0x2061, 'Function Application'],
+  [0x2062, 'Invisible Times'],
+  [0x2063, 'Invisible Separator'],
+  [0x2064, 'Invisible Plus'],
+  [0x00AD, 'Soft Hyphen'],
+  [0x061C, 'Arabic Letter Mark'],
+  [0x034F, 'Combining Grapheme Joiner'],
+  [0x180E, 'Mongolian Vowel Separator'],
+]);
+
 /**
  * Classify a codepoint into its character class.
  * Priority: Tags block > watermark > zerowidth fallback.
@@ -162,14 +181,16 @@ export function findInvisibleChars(
       const charType = classifyCodepoint(current.cp);
       let replacement: string;
 
+      const hex = current.cp.toString(16).toUpperCase().padStart(4, '0');
+
       if (charType === 'watermark') {
-        // Use named label from AI_WATERMARK_CHARS
+        // Use named label from AI_WATERMARK_CHARS + Unicode code
         const name = AI_WATERMARK_CHARS.get(current.cp)!;
-        replacement = `[${name}]`;
+        replacement = `[${name} U+${hex}]`;
       } else {
-        // Zerowidth fallback — hex code label
-        const hex = current.cp.toString(16).toUpperCase().padStart(4, '0');
-        replacement = `[U+${hex}]`;
+        // Zerowidth — use name if available, plus Unicode code
+        const name = ZEROWIDTH_NAMES.get(current.cp);
+        replacement = name ? `[${name} U+${hex}]` : `[U+${hex}]`;
       }
 
       findings.push({
