@@ -229,5 +229,14 @@ export default defineContentScript({
       scanActive = false;
       totalFindings = 0;
     });
+
+    // Reactively update highlight color when setting changes (SETT-01)
+    highlightColorSetting.watch((newColor) => {
+      const highlights =
+        document.querySelectorAll<HTMLElement>('[data-iu-highlight]');
+      for (const el of highlights) {
+        el.style.backgroundColor = newColor;
+      }
+    });
   },
 });
