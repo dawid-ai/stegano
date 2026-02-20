@@ -29,7 +29,10 @@ Six phases take the extension from bare scaffolding to Chrome Web Store publicat
   3. WXT project builds to a self-contained MV3 extension package with no external URL references — loadable in Chrome via `chrome://extensions`
   4. All processing is confirmed local-only: no network calls exist anywhere in the codebase, enforced by an ESLint rule or build-time check
   5. The manifest permission model is locked (activeTab for on-demand, optional all_urls for auto-scan) and the storage area allocation is documented in code comments (sync/local/session)
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 01-01-PLAN.md — WXT project scaffold with config, presets, storage, and no-network enforcement
+- [ ] 01-02-PLAN.md — Encode/decode codec implementation via TDD with comprehensive unit tests
 
 ### Phase 2: Scanner
 **Goal**: Users can trigger a page scan and see invisible Unicode characters revealed inline on any page with a badge count on the extension icon
@@ -97,7 +100,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/? | Not started | - |
+| 1. Foundation | 0/2 | Planning complete | - |
 | 2. Scanner | 0/? | Not started | - |
 | 3. Service Worker and Settings | 0/? | Not started | - |
 | 4. Popup UI | 0/? | Not started | - |
