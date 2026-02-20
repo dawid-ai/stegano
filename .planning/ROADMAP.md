@@ -74,7 +74,9 @@ Plans:
   3. User copies encoded output to clipboard via the copy button and sees a clear "Copied!" confirmation message
   4. Clipboard copy works in applications that do not support the Clipboard API — a manual copy fallback button is available
   5. User can clear both input fields with a single reset action
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 04-01-PLAN.md — Popup converter UI with encode/decode, clipboard copy, and clear
 
 ### Phase 5: Differentiating Features
 **Goal**: Users can save and paste named invisible Unicode snippets, the scanner detects AI watermark characters with named labels, and scan mode is configurable
@@ -109,6 +111,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Foundation | 2/2 | Complete    | 2026-02-20 |
 | 2. Scanner | 2/2 | Complete | 2026-02-20 |
 | 3. Service Worker and Settings | 2/2 | Complete | 2026-02-20 |
-| 4. Popup UI | 0/? | Not started | - |
+| 4. Popup UI | 0/1 | In progress | - |
 | 5. Differentiating Features | 0/? | Not started | - |
 | 6. Chrome Web Store Submission | 0/? | Not started | - |
