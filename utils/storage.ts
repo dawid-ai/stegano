@@ -62,6 +62,30 @@ export const highlightColorSetting = storage.defineItem<string>(
   { fallback: '#ffeb3b' },
 );
 
+/** Theme preference: dark (default) or light */
+export const themeSetting = storage.defineItem<'dark' | 'light'>(
+  'sync:theme',
+  { fallback: 'dark' },
+);
+
+/** Per-class highlight color for Tags block characters */
+export const tagsColorSetting = storage.defineItem<string>(
+  'sync:tagsColor',
+  { fallback: '#FFEB3B' },
+);
+
+/** Per-class highlight color for zero-width characters */
+export const zerowColorSetting = storage.defineItem<string>(
+  'sync:zerowColor',
+  { fallback: '#FF9800' },
+);
+
+/** Per-class highlight color for AI watermark characters */
+export const watermarkColorSetting = storage.defineItem<string>(
+  'sync:watermarkColor',
+  { fallback: '#E91E63' },
+);
+
 /** Scan mode: on-demand (user clicks scan) or auto (scan on page load) */
 export const scanModeSetting = storage.defineItem<ScanMode>(
   'sync:scanMode',

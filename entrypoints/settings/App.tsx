@@ -6,7 +6,10 @@ import {
   addSnippet,
   updateSnippet,
   deleteSnippet,
-  highlightColorSetting,
+  themeSetting,
+  tagsColorSetting,
+  zerowColorSetting,
+  watermarkColorSetting,
   scanModeSetting,
   sensitivitySetting,
 } from '@/utils/storage';
@@ -76,7 +79,10 @@ export function App() {
   const [createForm, setCreateForm] = useState<SnippetFormData>(emptyForm);
   const [quotaWarning, setQuotaWarning] = useState(false);
   const [storageError, setStorageError] = useState<string | null>(null);
-  const [highlightColor, setHighlightColor] = useState('#ffeb3b');
+  const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+  const [tagsColor, setTagsColor] = useState('#FFEB3B');
+  const [zerowColor, setZerowColor] = useState('#FF9800');
+  const [watermarkColor, setWatermarkColor] = useState('#E91E63');
   const [scanMode, setScanMode] = useState<ScanMode>('onDemand');
   const [sensitivity, setSensitivity] = useState<SensitivityLevel>('standard');
 
@@ -93,7 +99,13 @@ export function App() {
   // Load all settings on mount and watch for changes
   useEffect(() => {
     snippetsSetting.getValue().then(setSnippets);
-    highlightColorSetting.getValue().then(setHighlightColor);
+    themeSetting.getValue().then((t) => {
+      setTheme(t);
+      document.documentElement.classList.toggle('dark', t === 'dark');
+    });
+    tagsColorSetting.getValue().then(setTagsColor);
+    zerowColorSetting.getValue().then(setZerowColor);
+    watermarkColorSetting.getValue().then(setWatermarkColor);
     scanModeSetting.getValue().then(setScanMode);
     sensitivitySetting.getValue().then(setSensitivity);
 
@@ -103,10 +115,21 @@ export function App() {
         setQuotaWarning(estimateSize(newVal) > QUOTA_WARNING_BYTES);
       }
     });
+    const unwatchTheme = themeSetting.watch((t) => {
+      setTheme(t);
+      document.documentElement.classList.toggle('dark', t === 'dark');
+    });
     return () => {
       unwatchSnippets();
+      unwatchTheme();
     };
   }, []);
+
+  function handleThemeChange(newTheme: 'dark' | 'light') {
+    setTheme(newTheme);
+    document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    void themeSetting.setValue(newTheme);
+  }
 
   async function handleCreate() {
     if (!createForm.name.trim() || !createForm.content) return;
@@ -159,14 +182,14 @@ export function App() {
   }
 
   return (
-    <div class="min-h-screen bg-gray-50 text-sm">
+    <div class="min-h-screen bg-gray-50 dark:bg-gray-900 text-sm">
       <div class="max-w-2xl mx-auto px-6 py-8">
         {/* Header */}
         <div class="mb-6">
-          <h1 class="text-xl font-semibold text-gray-800">
+          <h1 class="text-xl font-semibold text-gray-800 dark:text-gray-100">
             Stegano Settings
           </h1>
-          <p class="text-xs text-gray-500 mt-1">
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
             Configure scanning, manage snippets, and customize detection
           </p>
         </div>
@@ -195,14 +218,29 @@ export function App() {
         )}
 
         {/* General Settings */}
-        <section class="mb-8 p-4 bg-white rounded-lg border border-gray-200">
-          <h2 class="text-sm font-medium text-gray-700 mb-4">
-            Scanner Settings
+        <section class="mb-8 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <h2 class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-4">
+            General Settings
           </h2>
           <div class="flex flex-col gap-4">
+            {/* Theme */}
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Theme</label>
+              <select
+                value={theme}
+                onChange={(e) => {
+                  handleThemeChange((e.target as HTMLSelectElement).value as 'dark' | 'light');
+                }}
+                class="w-full max-w-xs px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+              >
+                <option value="dark">Dark</option>
+                <option value="light">Light</option>
+              </select>
+            </div>
+
             {/* Scan Mode */}
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-medium text-gray-600">Scan Mode</label>
+              <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Scan Mode</label>
               <select
                 value={scanMode}
                 onChange={(e) => {
@@ -210,19 +248,19 @@ export function App() {
                   setScanMode(val);
                   void scanModeSetting.setValue(val);
                 }}
-                class="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white"
+                class="w-full max-w-xs px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
               >
-                <option value="onDemand">On-demand — scan when you click the button</option>
-                <option value="auto">Automatic — scan every page on load</option>
+                <option value="onDemand">On-demand -- scan when you click the button</option>
+                <option value="auto">Automatic -- scan every page on load</option>
               </select>
-              <p class="text-[11px] text-gray-400">
+              <p class="text-[11px] text-gray-400 dark:text-gray-500">
                 Auto mode requires the extension to have host permissions. You may be prompted to grant access.
               </p>
             </div>
 
             {/* Sensitivity Level */}
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-medium text-gray-600">Detection Sensitivity</label>
+              <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Detection Sensitivity</label>
               <select
                 value={sensitivity}
                 onChange={(e) => {
@@ -230,65 +268,122 @@ export function App() {
                   setSensitivity(val);
                   void sensitivitySetting.setValue(val);
                 }}
-                class="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white"
+                class="w-full max-w-xs px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
               >
-                <option value="standard">Standard — Tags block, zero-width, AI watermarks</option>
-                <option value="thorough">Thorough — adds invisible operators, variation selectors</option>
-                <option value="paranoid">Paranoid — adds directional overrides, soft hyphens, all invisible chars</option>
+                <option value="standard">Standard -- Tags block, zero-width, AI watermarks</option>
+                <option value="thorough">Thorough -- adds invisible operators, variation selectors</option>
+                <option value="paranoid">Paranoid -- adds directional overrides, soft hyphens, all invisible chars</option>
               </select>
             </div>
 
-            {/* Highlight Color */}
-            <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-medium text-gray-600">Highlight Color</label>
+            {/* Per-class Highlight Colors */}
+            <div class="flex flex-col gap-3">
+              <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Highlight Colors</label>
+
+              {/* Tags Block Color */}
               <div class="flex items-center gap-3">
                 <input
                   type="color"
-                  value={highlightColor}
+                  value={tagsColor}
                   onInput={(e) => {
                     const val = (e.target as HTMLInputElement).value;
-                    setHighlightColor(val);
-                    void highlightColorSetting.setValue(val);
+                    setTagsColor(val);
+                    void tagsColorSetting.setValue(val);
                   }}
-                  class="w-10 h-10 border border-gray-300 rounded cursor-pointer"
+                  class="w-10 h-10 border border-gray-300 dark:border-gray-600 rounded cursor-pointer"
                 />
                 <div class="flex flex-col">
-                  <span class="text-xs text-gray-600">{highlightColor}</span>
+                  <span class="text-xs text-gray-600 dark:text-gray-400">Tags Block Color: {tagsColor}</span>
                   <button
                     type="button"
                     onClick={() => {
-                      setHighlightColor('#ffeb3b');
-                      void highlightColorSetting.setValue('#ffeb3b');
+                      setTagsColor('#FFEB3B');
+                      void tagsColorSetting.setValue('#FFEB3B');
                     }}
                     class="text-[11px] text-blue-600 hover:text-blue-800 text-left"
                   >
-                    Reset to default (per-class colors)
+                    Reset to default
                   </button>
                 </div>
               </div>
-              <p class="text-[11px] text-gray-400">
-                Default uses per-class colors: yellow for Tags block, orange for zero-width, pink for AI watermarks. Custom color overrides all classes.
+
+              {/* Zero-Width Color */}
+              <div class="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={zerowColor}
+                  onInput={(e) => {
+                    const val = (e.target as HTMLInputElement).value;
+                    setZerowColor(val);
+                    void zerowColorSetting.setValue(val);
+                  }}
+                  class="w-10 h-10 border border-gray-300 dark:border-gray-600 rounded cursor-pointer"
+                />
+                <div class="flex flex-col">
+                  <span class="text-xs text-gray-600 dark:text-gray-400">Zero-Width Color: {zerowColor}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setZerowColor('#FF9800');
+                      void zerowColorSetting.setValue('#FF9800');
+                    }}
+                    class="text-[11px] text-blue-600 hover:text-blue-800 text-left"
+                  >
+                    Reset to default
+                  </button>
+                </div>
+              </div>
+
+              {/* Watermark Color */}
+              <div class="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={watermarkColor}
+                  onInput={(e) => {
+                    const val = (e.target as HTMLInputElement).value;
+                    setWatermarkColor(val);
+                    void watermarkColorSetting.setValue(val);
+                  }}
+                  class="w-10 h-10 border border-gray-300 dark:border-gray-600 rounded cursor-pointer"
+                />
+                <div class="flex flex-col">
+                  <span class="text-xs text-gray-600 dark:text-gray-400">Watermark Color: {watermarkColor}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setWatermarkColor('#E91E63');
+                      void watermarkColorSetting.setValue('#E91E63');
+                    }}
+                    class="text-[11px] text-blue-600 hover:text-blue-800 text-left"
+                  >
+                    Reset to default
+                  </button>
+                </div>
+              </div>
+
+              <p class="text-[11px] text-gray-400 dark:text-gray-500">
+                Customize highlight colors per character class: yellow for Tags block, orange for zero-width, pink for AI watermarks.
               </p>
             </div>
 
             {/* Keyboard Shortcuts Reference */}
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-medium text-gray-600">Keyboard Shortcuts</label>
-              <div class="text-xs text-gray-600 space-y-1">
+              <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Keyboard Shortcuts</label>
+              <div class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
                 <div class="flex justify-between max-w-xs">
                   <span>Open popup</span>
-                  <kbd class="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-[11px]">Ctrl+Shift+U</kbd>
+                  <kbd class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-[11px]">Ctrl+Shift+U</kbd>
                 </div>
                 <div class="flex justify-between max-w-xs">
                   <span>Toggle scan</span>
-                  <kbd class="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-[11px]">Alt+Shift+S</kbd>
+                  <kbd class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-[11px]">Alt+Shift+S</kbd>
                 </div>
                 <div class="flex justify-between max-w-xs">
                   <span>Quick paste</span>
-                  <kbd class="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-[11px]">Alt+Shift+V</kbd>
+                  <kbd class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-[11px]">Alt+Shift+V</kbd>
                 </div>
               </div>
-              <p class="text-[11px] text-gray-400">
+              <p class="text-[11px] text-gray-400 dark:text-gray-500">
                 Customize these in <code>chrome://extensions/shortcuts</code>
               </p>
             </div>
@@ -296,8 +391,8 @@ export function App() {
         </section>
 
         {/* Create Form */}
-        <section class="mb-8 p-4 bg-white rounded-lg border border-gray-200">
-          <h2 class="text-sm font-medium text-gray-700 mb-3">
+        <section class="mb-8 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <h2 class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
             Create New Snippet
           </h2>
           <div class="flex flex-col gap-3">
@@ -311,7 +406,7 @@ export function App() {
                 })
               }
               placeholder="Snippet name"
-              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
             />
             <textarea
               value={createForm.content}
@@ -322,18 +417,18 @@ export function App() {
                 })
               }
               placeholder="Paste invisible Unicode content here..."
-              class="w-full h-20 px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm text-transparent"
+              class="w-full h-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm text-transparent bg-white dark:bg-gray-800"
             />
             {createForm.content && (
-              <p class="text-xs text-gray-500">
+              <p class="text-xs text-gray-500 dark:text-gray-400">
                 {invisibleCharCount(createForm.content)} invisible characters
               </p>
             )}
 
             {/* Shortcut configurator */}
             <div class="flex items-center gap-3 flex-wrap">
-              <span class="text-xs text-gray-600">Shortcut:</span>
-              <label class="flex items-center gap-1 text-xs">
+              <span class="text-xs text-gray-600 dark:text-gray-400">Shortcut:</span>
+              <label class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300">
                 <input
                   type="checkbox"
                   checked={createForm.shortcutAlt}
@@ -346,7 +441,7 @@ export function App() {
                 />
                 Alt
               </label>
-              <label class="flex items-center gap-1 text-xs">
+              <label class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300">
                 <input
                   type="checkbox"
                   checked={createForm.shortcutShift}
@@ -359,7 +454,7 @@ export function App() {
                 />
                 Shift
               </label>
-              <label class="flex items-center gap-1 text-xs">
+              <label class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300">
                 <input
                   type="checkbox"
                   checked={createForm.shortcutCtrl}
@@ -383,7 +478,7 @@ export function App() {
                   })
                 }
                 placeholder="Key"
-                class="w-12 px-2 py-1 border border-gray-300 rounded-md text-xs text-center focus:outline-none focus:ring-2 focus:ring-blue-400"
+                class="w-12 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-xs text-center focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
               />
             </div>
 
@@ -400,12 +495,12 @@ export function App() {
 
         {/* Snippet List */}
         <section>
-          <h2 class="text-sm font-medium text-gray-700 mb-3">
+          <h2 class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
             Saved Snippets ({snippets.length})
           </h2>
 
           {snippets.length === 0 ? (
-            <p class="text-xs text-gray-400 italic">
+            <p class="text-xs text-gray-400 dark:text-gray-500 italic">
               No snippets saved yet. Create one above.
             </p>
           ) : (
@@ -415,7 +510,7 @@ export function App() {
                   /* Inline Edit Form */
                   <div
                     key={snippet.id}
-                    class="p-4 bg-white rounded-lg border-2 border-blue-300"
+                    class="p-4 bg-white dark:bg-gray-800 rounded-lg border-2 border-blue-300 dark:border-blue-600"
                   >
                     <div class="flex flex-col gap-3">
                       <input
@@ -428,7 +523,7 @@ export function App() {
                           })
                         }
                         placeholder="Snippet name"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                       />
                       <textarea
                         value={editForm.content}
@@ -439,10 +534,10 @@ export function App() {
                           })
                         }
                         placeholder="Paste invisible Unicode content here..."
-                        class="w-full h-20 px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm text-transparent"
+                        class="w-full h-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm text-transparent bg-white dark:bg-gray-800"
                       />
                       {editForm.content && (
-                        <p class="text-xs text-gray-500">
+                        <p class="text-xs text-gray-500 dark:text-gray-400">
                           {invisibleCharCount(editForm.content)} invisible
                           characters
                         </p>
@@ -450,8 +545,8 @@ export function App() {
 
                       {/* Shortcut configurator */}
                       <div class="flex items-center gap-3 flex-wrap">
-                        <span class="text-xs text-gray-600">Shortcut:</span>
-                        <label class="flex items-center gap-1 text-xs">
+                        <span class="text-xs text-gray-600 dark:text-gray-400">Shortcut:</span>
+                        <label class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300">
                           <input
                             type="checkbox"
                             checked={editForm.shortcutAlt}
@@ -465,7 +560,7 @@ export function App() {
                           />
                           Alt
                         </label>
-                        <label class="flex items-center gap-1 text-xs">
+                        <label class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300">
                           <input
                             type="checkbox"
                             checked={editForm.shortcutShift}
@@ -479,7 +574,7 @@ export function App() {
                           />
                           Shift
                         </label>
-                        <label class="flex items-center gap-1 text-xs">
+                        <label class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300">
                           <input
                             type="checkbox"
                             checked={editForm.shortcutCtrl}
@@ -504,7 +599,7 @@ export function App() {
                             })
                           }
                           placeholder="Key"
-                          class="w-12 px-2 py-1 border border-gray-300 rounded-md text-xs text-center focus:outline-none focus:ring-2 focus:ring-blue-400"
+                          class="w-12 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-xs text-center focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                         />
                       </div>
 
@@ -522,7 +617,7 @@ export function App() {
                         <button
                           type="button"
                           onClick={cancelEdit}
-                          class="px-4 py-1.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-md border border-gray-300 hover:bg-gray-200 transition-colors"
+                          class="px-4 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
                         >
                           Cancel
                         </button>
@@ -533,16 +628,16 @@ export function App() {
                   /* Snippet Display Row */
                   <div
                     key={snippet.id}
-                    class="p-4 bg-white rounded-lg border border-gray-200 flex items-center justify-between gap-4"
+                    class="p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-between gap-4"
                   >
                     <div class="flex-1 min-w-0">
-                      <p class="font-medium text-gray-800 truncate">
+                      <p class="font-medium text-gray-800 dark:text-gray-100 truncate">
                         {snippet.name}
                       </p>
-                      <p class="text-xs text-gray-500 mt-0.5">
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
                         [{invisibleCharCount(snippet.content)} invisible chars]
                       </p>
-                      <p class="text-xs text-gray-400 mt-0.5">
+                      <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                         {formatShortcut(snippet.shortcut)}
                       </p>
                     </div>
@@ -550,14 +645,14 @@ export function App() {
                       <button
                         type="button"
                         onClick={() => startEdit(snippet)}
-                        class="px-3 py-1 text-xs text-blue-600 border border-blue-300 rounded-md hover:bg-blue-50 transition-colors"
+                        class="px-3 py-1 text-xs text-blue-600 border border-blue-300 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors"
                       >
                         Edit
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDelete(snippet.id)}
-                        class="px-3 py-1 text-xs text-red-600 border border-red-300 rounded-md hover:bg-red-50 transition-colors"
+                        class="px-3 py-1 text-xs text-red-600 border border-red-300 rounded-md hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
                       >
                         Delete
                       </button>

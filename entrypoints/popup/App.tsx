@@ -4,6 +4,7 @@ import { encode, decode } from '@/utils/codec';
 import { copyToClipboard } from '@/utils/clipboard';
 import { sendMessage } from '@/utils/messaging';
 import { buildScanReport } from '@/utils/export';
+import { themeSetting } from '@/utils/storage';
 
 export function App() {
   const [encodeInput, setEncodeInput] = useState('');
@@ -16,6 +17,17 @@ export function App() {
   const [scanActive, setScanActive] = useState(false);
   const copyTimer = useRef<number>(0);
   const exportTimer = useRef<number>(0);
+
+  // Apply dark mode on mount and watch for changes
+  useEffect(() => {
+    themeSetting.getValue().then((theme) => {
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+    });
+    const unwatch = themeSetting.watch((theme) => {
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+    });
+    return () => { unwatch(); };
+  }, []);
 
   // Check if scan is active on current tab (badge text is non-empty)
   useEffect(() => {
@@ -73,16 +85,6 @@ export function App() {
     copyTimer.current = window.setTimeout(() => setCopied('idle'), 2000);
   }
 
-  function handleClear() {
-    setEncodeInput('');
-    setEncodeOutput('');
-    setDecodeInput('');
-    setDecodeOutput('');
-    setError('');
-    setCopied('idle');
-    clearTimeout(copyTimer.current);
-  }
-
   const handleScanPage = useCallback(async () => {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
     if (!tab?.id) return;
@@ -133,9 +135,9 @@ export function App() {
   }, []);
 
   return (
-    <div class="flex flex-col gap-4 p-4 bg-gray-50 min-h-full text-sm">
+    <div class="flex flex-col gap-4 p-4 bg-gray-50 dark:bg-gray-900 min-h-full text-sm">
       <div class="flex items-center justify-between">
-        <h1 class="text-base font-semibold text-gray-800">Stegano</h1>
+        <h1 class="text-base font-semibold text-gray-800 dark:text-gray-100">Stegano</h1>
         <div class="flex items-center gap-1">
           <button
             type="button"
@@ -147,7 +149,7 @@ export function App() {
                   ? 'text-amber-700 bg-amber-100'
                   : exportStatus === 'fail'
                     ? 'text-red-700 bg-red-100'
-                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'
+                    : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700'
             }`}
           >
             {exportStatus === 'success'
@@ -160,16 +162,9 @@ export function App() {
           </button>
           <button
             type="button"
-            onClick={handleClear}
-            class="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
-          >
-            Clear All
-          </button>
-          <button
-            type="button"
             onClick={handleOpenSettings}
             title="Settings"
-            class="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
+            class="text-lg text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 px-1.5 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
             &#9881;
           </button>
@@ -189,16 +184,16 @@ export function App() {
         >
           {scanActive ? 'Clear Scan Highlights' : 'Scan Page for Hidden Characters'}
         </button>
-        <p class="text-[10px] text-gray-400 text-center">
-          Or press <kbd class="px-1 py-0.5 bg-gray-200 text-gray-600 rounded text-[10px]">Alt+Shift+S</kbd> to toggle scan without popup
+        <p class="text-[10px] text-gray-400 dark:text-gray-500 text-center">
+          Or press <kbd class="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400 rounded text-[10px]">Alt+Shift+S</kbd> to toggle scan without popup
         </p>
       </section>
 
-      <hr class="border-gray-200" />
+      <hr class="border-gray-200 dark:border-gray-700" />
 
       {/* Encode Section */}
       <section class="flex flex-col gap-2">
-        <label class="text-xs font-medium text-gray-600 uppercase tracking-wide">
+        <label class="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
           Encode
         </label>
         <textarea
@@ -208,7 +203,7 @@ export function App() {
             if (error) setError('');
           }}
           placeholder="Type or paste text to encode..."
-          class="w-full h-24 px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm"
+          class="w-full h-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
         />
         <div class="flex items-center gap-2">
           <button
@@ -228,7 +223,7 @@ export function App() {
                 ? 'bg-green-100 text-green-700 border border-green-300'
                 : copied === 'fail'
                   ? 'bg-red-100 text-red-700 border border-red-300'
-                  : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
+                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700'
             } disabled:opacity-40 disabled:cursor-not-allowed`}
           >
             {copied === 'success'
@@ -246,9 +241,9 @@ export function App() {
             <textarea
               value={encodeOutput}
               readOnly
-              class="w-full h-16 px-3 py-2 border border-gray-200 rounded-md resize-none bg-gray-100 text-sm text-transparent select-all"
+              class="w-full h-16 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md resize-none bg-gray-100 dark:bg-gray-800 text-sm text-transparent select-all"
             />
-            <p class="text-xs text-gray-500">
+            <p class="text-xs text-gray-500 dark:text-gray-400">
               {[...encodeOutput].length} invisible characters
             </p>
           </div>
@@ -257,7 +252,7 @@ export function App() {
 
       {/* Decode Section */}
       <section class="flex flex-col gap-2">
-        <label class="text-xs font-medium text-gray-600 uppercase tracking-wide">
+        <label class="text-xs font-medium text-gray-600 dark:text-gray-400 uppercase tracking-wide">
           Decode
         </label>
         <textarea
@@ -266,13 +261,13 @@ export function App() {
             handleDecodeInput((e.target as HTMLTextAreaElement).value)
           }
           placeholder="Paste invisible Unicode to decode..."
-          class="w-full h-24 px-3 py-2 border border-gray-300 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm"
+          class="w-full h-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
         />
         {decodeOutput && (
           <textarea
             value={decodeOutput}
             readOnly
-            class="w-full h-20 px-3 py-2 border border-gray-200 rounded-md resize-none bg-gray-100 text-sm"
+            class="w-full h-20 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md resize-none bg-gray-100 dark:bg-gray-800 text-sm text-gray-800 dark:text-gray-100"
           />
         )}
       </section>
@@ -283,7 +278,7 @@ export function App() {
           href="https://dawid.ai/stegano"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-[10px] text-gray-400 hover:text-blue-500 transition-colors"
+          class="text-[10px] text-gray-400 dark:text-gray-500 hover:text-blue-500 transition-colors"
         >
           dawid.ai/stegano
         </a>
