@@ -11,8 +11,8 @@ Six phases take the extension from bare scaffolding to Chrome Web Store publicat
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
 - [x] **Phase 1: Foundation** - Core Unicode logic, WXT build setup, MV3 architecture decisions
-- [ ] **Phase 2: Scanner** - Content script DOM scanner, inline highlighting, badge count
-- [ ] **Phase 3: Service Worker and Settings** - Keyboard shortcuts, settings persistence, background logic
+- [x] **Phase 2: Scanner** - Content script DOM scanner, inline highlighting, badge count
+- [x] **Phase 3: Service Worker and Settings** - Keyboard shortcuts, settings persistence, background logic
 - [ ] **Phase 4: Popup UI** - Converter interface, copy/clear, scan trigger in popup
 - [ ] **Phase 5: Differentiating Features** - Snippets library, AI watermark detection, configurable scan modes, export
 - [ ] **Phase 6: Chrome Web Store Submission** - Polish, permission justification, privacy policy, publish
@@ -44,10 +44,10 @@ Plans:
   3. Extension icon badge shows the correct count of hidden characters found after any scan completes
   4. User can toggle highlights off and back on without reloading the page — original page content is not destroyed
   5. Scanner does not noticeably degrade page load or interaction on a Wikipedia-length article (under 200ms TTI impact)
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
 - [x] 02-01-PLAN.md — Scanner pure functions (TDD) and messaging protocol
-- [ ] 02-02-PLAN.md — Background service worker + content script integration with inline highlighting
+- [x] 02-02-PLAN.md — Background service worker + content script integration with inline highlighting
 
 ### Phase 3: Service Worker and Settings
 **Goal**: Keyboard shortcuts work reliably, settings persist across browser sessions, and the service worker survives termination without losing functionality
@@ -59,10 +59,10 @@ Plans:
   3. User's chosen scan mode preference persists after closing and reopening the browser
   4. All keyboard shortcut and badge features continue to work after the service worker is stopped and restarted via DevTools (cold-start verification)
   5. User can configure the highlight color/style and the setting takes effect on the next scan without requiring a page reload
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 03-01-PLAN.md — Keyboard shortcuts (commands manifest + onCommand + quick-paste) and scan mode persistence
-- [ ] 03-02-PLAN.md — Reactive highlight color updates via storage.watch() in content script
+- [x] 03-01-PLAN.md — Keyboard shortcuts (commands manifest + onCommand + quick-paste) and scan mode persistence
+- [x] 03-02-PLAN.md — Reactive highlight color updates via storage.watch() in content script
 
 ### Phase 4: Popup UI
 **Goal**: Users can encode text to invisible Unicode and decode it back entirely within the popup, with reliable clipboard copy
@@ -107,8 +107,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete    | 2026-02-20 |
-| 2. Scanner | 1/2 | In Progress | - |
-| 3. Service Worker and Settings | 0/2 | Not started | - |
+| 2. Scanner | 2/2 | Complete | 2026-02-20 |
+| 3. Service Worker and Settings | 2/2 | Complete | 2026-02-20 |
 | 4. Popup UI | 0/? | Not started | - |
 | 5. Differentiating Features | 0/? | Not started | - |
 | 6. Chrome Web Store Submission | 0/? | Not started | - |
