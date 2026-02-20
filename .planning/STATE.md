@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-19)
 
 **Core value:** Detect and reveal hidden Unicode text on any web page — protecting against prompt injection and hidden content attacks
-**Current focus:** Phase 4 — Popup UI
+**Current focus:** Phase 5 — Differentiating Features
 
 ## Current Position
 
-Phase: 4 of 6 (Popup UI)
-Plan: 1 of 1 in current phase
-Status: Phase 4 complete
-Last activity: 2026-02-20 — Completed Phase 4 Plan 1 (Popup Converter UI)
+Phase: 5 of 6 (Differentiating Features)
+Plan: 2 of 3 in current phase
+Status: Executing phase 5
+Last activity: 2026-02-20 — Completed Phase 5 Plan 1 (AI Watermark Detection)
 
-Progress: [██████░░░░] 60%
+Progress: [████████░░] 80%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
-- Average duration: 4 min
-- Total execution time: 0.37 hours
+- Total plans completed: 9
+- Average duration: 3 min
+- Total execution time: 0.48 hours
 
 **By Phase:**
 
@@ -31,10 +31,11 @@ Progress: [██████░░░░] 60%
 | 02-scanner | 1 | 3 min | 3 min |
 | 03-service-worker-and-settings | 2 | 3 min | 1.5 min |
 | 04-popup-ui | 1 | 2 min | 2 min |
+| 05-differentiating-features | 2 | 6 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 3min, 1min, 2min, 2min
-- Trend: accelerating
+- Last 5 plans: 1min, 2min, 2min, 3min, 3min
+- Trend: steady
 
 *Updated after each plan completion*
 
@@ -65,6 +66,8 @@ Recent decisions affecting current work:
 - [04-01]: Encode is button-triggered (can throw), decode is live on input (never throws)
 - [04-01]: Encoded output textarea uses text-transparent since Tags block chars are invisible
 - [04-01]: Single Clear All button in header rather than per-section clear buttons
+- [05-02]: Used sync storage for snippets (not local) per prior decision for cross-device sync
+- [05-02]: Alt+Shift pre-checked in shortcut configurator per prior keyboard shortcut convention
 
 ### Pending Todos
 
@@ -77,5 +80,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 04-01-PLAN.md (Popup Converter UI)
-Resume file: .planning/phases/04-popup-ui/04-01-SUMMARY.md
+Stopped at: Completed 05-02-PLAN.md (Snippet Storage & Settings Page)
+Resume file: .planning/phases/05-differentiating-features/05-02-SUMMARY.md

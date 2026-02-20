@@ -27,9 +27,9 @@
 
 ### Snippets
 
-- [ ] **SNIP-01**: User can save named invisible Unicode snippets in extension settings
+- [x] **SNIP-01**: User can save named invisible Unicode snippets in extension settings
 - [ ] **SNIP-02**: User can paste a saved snippet via its assigned keyboard shortcut
-- [ ] **SNIP-03**: User can edit and delete saved snippets
+- [x] **SNIP-03**: User can edit and delete saved snippets
 
 ### Shortcuts
 
@@ -90,9 +90,9 @@
 | SCAN-07 | Phase 2 | Complete |
 | SCAN-08 | Phase 2 | Pending |
 | SCAN-09 | Phase 5 | Pending |
-| SNIP-01 | Phase 5 | Pending |
+| SNIP-01 | Phase 5 | Complete |
 | SNIP-02 | Phase 5 | Pending |
-| SNIP-03 | Phase 5 | Pending |
+| SNIP-03 | Phase 5 | Complete |
 | KEYS-01 | Phase 3 | Complete |
 | KEYS-02 | Phase 3 | Complete |
 | KEYS-03 | Phase 3 | Complete |
