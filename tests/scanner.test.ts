@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { findInvisibleChars, decodeTagsRun, type ScanFinding } from '../utils/scanner';
+import { findInvisibleChars, decodeTagsRun } from '../utils/scanner';
 
 // ---------------------------------------------------------------------------
 // Helper: encode ASCII text into Tags block characters (mirrors codec.ts logic)
