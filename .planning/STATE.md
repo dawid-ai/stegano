@@ -9,29 +9,29 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 
 ## Current Position
 
-Phase: 1 of 6 (Foundation)
-Plan: 1 of 2 in current phase
-Status: Executing
-Last activity: 2026-02-20 — Completed 01-01 project scaffold
+Phase: 1 of 6 (Foundation) -- COMPLETE
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-02-20 — Completed 01-02 codec (TDD)
 
-Progress: [█░░░░░░░░░] 8%
+Progress: [██░░░░░░░░] 17%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 10 min
-- Total execution time: 0.17 hours
+- Total plans completed: 2
+- Average duration: 7 min
+- Total execution time: 0.23 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation | 1 | 10 min | 10 min |
+| 01-foundation | 2 | 14 min | 7 min |
 
 **Recent Trend:**
-- Last 5 plans: 10min
-- Trend: baseline
+- Last 5 plans: 10min, 4min
+- Trend: accelerating
 
 *Updated after each plan completion*
 
@@ -50,6 +50,9 @@ Recent decisions affecting current work:
 - [01-01]: Used hoisted node-linker (.npmrc) to work around pnpm Windows symlink bug
 - [01-01]: ESLint 9 pinned for wxt peer dependency compatibility
 - [01-01]: Sync storage chosen for all settings (cross-device sync)
+- [01-02]: Tags block full range (U+E0000-E007F) used for encoding, not just printable ASCII subset
+- [01-02]: BOM at position 0 skipped silently; BOM elsewhere stripped per active preset
+- [01-02]: Wrapper chars (U+E0001, U+E007F) stripped as part of Tags block range handling in decode
 
 ### Pending Todos
 
@@ -62,5 +65,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 01-01-PLAN.md (project scaffold). Next: 01-02-PLAN.md (codec).
-Resume file: .planning/phases/01-foundation/01-02-PLAN.md
+Stopped at: Completed 01-02-PLAN.md (codec). Phase 1 complete. Next: Phase 2 planning.
+Resume file: .planning/ROADMAP.md

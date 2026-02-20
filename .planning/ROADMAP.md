@@ -10,7 +10,7 @@ Six phases take the extension from bare scaffolding to Chrome Web Store publicat
 - Integer phases (1, 2, 3): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-- [ ] **Phase 1: Foundation** - Core Unicode logic, WXT build setup, MV3 architecture decisions
+- [x] **Phase 1: Foundation** - Core Unicode logic, WXT build setup, MV3 architecture decisions
 - [ ] **Phase 2: Scanner** - Content script DOM scanner, inline highlighting, badge count
 - [ ] **Phase 3: Service Worker and Settings** - Keyboard shortcuts, settings persistence, background logic
 - [ ] **Phase 4: Popup UI** - Converter interface, copy/clear, scan trigger in popup
@@ -31,8 +31,8 @@ Six phases take the extension from bare scaffolding to Chrome Web Store publicat
   5. The manifest permission model is locked (activeTab for on-demand, optional all_urls for auto-scan) and the storage area allocation is documented in code comments (sync/local/session)
 **Plans:** 2 plans
 Plans:
-- [ ] 01-01-PLAN.md — WXT project scaffold with config, presets, storage, and no-network enforcement
-- [ ] 01-02-PLAN.md — Encode/decode codec implementation via TDD with comprehensive unit tests
+- [x] 01-01-PLAN.md — WXT project scaffold with config, presets, storage, and no-network enforcement
+- [x] 01-02-PLAN.md — Encode/decode codec implementation via TDD with comprehensive unit tests
 
 ### Phase 2: Scanner
 **Goal**: Users can trigger a page scan and see invisible Unicode characters revealed inline on any page with a badge count on the extension icon
@@ -100,7 +100,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/2 | Planning complete | - |
+| 1. Foundation | 2/2 | Complete | 2026-02-20 |
 | 2. Scanner | 0/? | Not started | - |
 | 3. Service Worker and Settings | 0/? | Not started | - |
 | 4. Popup UI | 0/? | Not started | - |
