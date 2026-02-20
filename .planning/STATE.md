@@ -88,5 +88,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 06-01-PLAN.md (Store Submission Preparation)
-Resume file: .planning/phases/06-chrome-web-store-submission/06-01-SUMMARY.md
+Stopped at: Completed quick task 1 (dark mode, per-class colors, Unicode codes)
+Resume file: .planning/quick/1-add-dark-mode-fix-settings-ui-remove-bro/1-SUMMARY.md
