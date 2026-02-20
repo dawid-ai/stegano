@@ -65,5 +65,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 01-02-PLAN.md (codec). Phase 1 complete. Next: Phase 2 planning.
-Resume file: .planning/ROADMAP.md
+Stopped at: Phase 2 context gathered. Next: /gsd:plan-phase 2
+Resume file: .planning/phases/02-scanner/02-CONTEXT.md
