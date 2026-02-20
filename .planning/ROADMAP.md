@@ -59,7 +59,10 @@ Plans:
   3. User's chosen scan mode preference persists after closing and reopening the browser
   4. All keyboard shortcut and badge features continue to work after the service worker is stopped and restarted via DevTools (cold-start verification)
   5. User can configure the highlight color/style and the setting takes effect on the next scan without requiring a page reload
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 03-01-PLAN.md — Keyboard shortcuts (commands manifest + onCommand + quick-paste) and scan mode persistence
+- [ ] 03-02-PLAN.md — Reactive highlight color updates via storage.watch() in content script
 
 ### Phase 4: Popup UI
 **Goal**: Users can encode text to invisible Unicode and decode it back entirely within the popup, with reliable clipboard copy
@@ -105,7 +108,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete    | 2026-02-20 |
 | 2. Scanner | 1/2 | In Progress | - |
-| 3. Service Worker and Settings | 0/? | Not started | - |
+| 3. Service Worker and Settings | 0/2 | Not started | - |
 | 4. Popup UI | 0/? | Not started | - |
 | 5. Differentiating Features | 0/? | Not started | - |
 | 6. Chrome Web Store Submission | 0/? | Not started | - |
