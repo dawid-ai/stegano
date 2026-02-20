@@ -46,7 +46,7 @@ Plans:
   5. Scanner does not noticeably degrade page load or interaction on a Wikipedia-length article (under 200ms TTI impact)
 **Plans:** 2 plans
 Plans:
-- [ ] 02-01-PLAN.md — Scanner pure functions (TDD) and messaging protocol
+- [x] 02-01-PLAN.md — Scanner pure functions (TDD) and messaging protocol
 - [ ] 02-02-PLAN.md — Background service worker + content script integration with inline highlighting
 
 ### Phase 3: Service Worker and Settings
@@ -104,7 +104,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 2/2 | Complete    | 2026-02-20 |
-| 2. Scanner | 0/? | Not started | - |
+| 2. Scanner | 1/2 | In Progress | - |
 | 3. Service Worker and Settings | 0/? | Not started | - |
 | 4. Popup UI | 0/? | Not started | - |
 | 5. Differentiating Features | 0/? | Not started | - |

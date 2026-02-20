@@ -5,32 +5,33 @@
 See: .planning/PROJECT.md (updated 2026-02-19)
 
 **Core value:** Detect and reveal hidden Unicode text on any web page — protecting against prompt injection and hidden content attacks
-**Current focus:** Phase 1 — Foundation
+**Current focus:** Phase 2 — Scanner
 
 ## Current Position
 
-Phase: 1 of 6 (Foundation) -- COMPLETE
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-02-20 — Completed 01-02 codec (TDD)
+Phase: 2 of 6 (Scanner)
+Plan: 1 of 2 in current phase
+Status: Executing
+Last activity: 2026-02-20 — Completed 02-01 scanner pure functions (TDD)
 
-Progress: [██░░░░░░░░] 17%
+Progress: [███░░░░░░░] 25%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 7 min
-- Total execution time: 0.23 hours
+- Total plans completed: 3
+- Average duration: 6 min
+- Total execution time: 0.28 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 14 min | 7 min |
+| 02-scanner | 1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 10min, 4min
+- Last 5 plans: 10min, 4min, 3min
 - Trend: accelerating
 
 *Updated after each plan completion*
@@ -53,6 +54,9 @@ Recent decisions affecting current work:
 - [01-02]: Tags block full range (U+E0000-E007F) used for encoding, not just printable ASCII subset
 - [01-02]: BOM at position 0 skipped silently; BOM elsewhere stripped per active preset
 - [01-02]: Wrapper chars (U+E0001, U+E007F) stripped as part of Tags block range handling in decode
+- [02-01]: Used regex.exec() loop (not for...of) for UTF-16 offset compatibility with Text.splitText()
+- [02-01]: Adjacent Tags block matches merged in second pass after collecting all raw regex matches
+- [02-01]: Messaging ProtocolMap uses function syntax (not deprecated ProtocolWithReturn)
 
 ### Pending Todos
 
@@ -65,5 +69,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 2 context gathered. Next: /gsd:plan-phase 2
-Resume file: .planning/phases/02-scanner/02-CONTEXT.md
+Stopped at: Completed 02-01-PLAN.md (scanner pure functions + messaging)
+Resume file: .planning/phases/02-scanner/02-01-SUMMARY.md
