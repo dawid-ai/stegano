@@ -13,7 +13,8 @@
 
 import { onMessage } from '@/utils/messaging';
 import { findInvisibleChars, type ScanFinding } from '@/utils/scanner';
-import { highlightColorSetting } from '@/utils/storage';
+import { highlightColorSetting, snippetsSetting } from '@/utils/storage';
+import type { Snippet } from '@/utils/types';
 
 /** Tags to skip when walking the DOM */
 const SKIP_TAGS = new Set([
@@ -235,6 +236,31 @@ async function performFullScan(): Promise<{ count: number }> {
 export default defineContentScript({
   matches: ['<all_urls>'],
   main() {
+    // --- Snippet keyboard shortcuts ---
+    let snippets: Snippet[] = [];
+    snippetsSetting.getValue().then((s) => { snippets = s; });
+    snippetsSetting.watch((s) => { snippets = s; });
+
+    document.addEventListener('keydown', (e: KeyboardEvent) => {
+      if (!e.altKey || !e.shiftKey) return; // Alt+Shift prefix required
+
+      const match = snippets.find((s) =>
+        s.shortcut &&
+        s.shortcut.key.toLowerCase() === e.key.toLowerCase() &&
+        s.shortcut.alt === e.altKey &&
+        s.shortcut.shift === e.shiftKey &&
+        !!s.shortcut.ctrl === e.ctrlKey,
+      );
+
+      if (match) {
+        e.preventDefault();
+        e.stopPropagation();
+        navigator.clipboard.writeText(match.content).catch(() => {
+          // Clipboard write may fail if page doesn't have focus
+        });
+      }
+    }, true); // useCapture to intercept before page handlers
+
     // Health check — verify content script is injected and responsive
     onMessage('ping', () => 'pong' as const);
 
@@ -250,6 +276,24 @@ export default defineContentScript({
       scanActive = false;
       totalFindings = 0;
       allFindings = [];
+    });
+
+    // Return structured findings for export
+    onMessage('getFindings', () => {
+      if (!scanActive || allFindings.length === 0) return null;
+      return {
+        findings: allFindings.map((f) => ({
+          type: f.type,
+          replacement: f.replacement,
+          original: f.original,
+          codepoints: [...f.original].map((ch) =>
+            'U+' + (ch.codePointAt(0) ?? 0).toString(16).toUpperCase().padStart(4, '0'),
+          ),
+          position: { start: f.start, end: f.end },
+        })),
+        url: window.location.href,
+        timestamp: new Date().toISOString(),
+      };
     });
 
     // Reactively update highlight color when setting changes (SETT-01)

@@ -15,11 +15,28 @@ export interface ScanResult {
   count: number;
 }
 
+/** A single finding serialized for cross-context messaging */
+export interface FindingEntry {
+  type: 'tags' | 'zerowidth' | 'watermark';
+  replacement: string;
+  original: string;
+  codepoints: string[];
+  position: { start: number; end: number };
+}
+
+/** Structured scan findings response from the content script */
+export interface FindingsResponse {
+  findings: FindingEntry[];
+  url: string;
+  timestamp: string;
+}
+
 /** All message types and their return values */
 type MessageMap = {
   ping: { data: undefined; response: 'pong' };
   startScan: { data: undefined; response: ScanResult };
   clearScan: { data: undefined; response: void };
+  getFindings: { data: undefined; response: FindingsResponse | null };
 };
 
 type MessageType = keyof MessageMap;
