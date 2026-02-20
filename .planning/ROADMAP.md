@@ -103,7 +103,10 @@ Plans:
   2. The Chrome Web Store listing includes a permission justification that explains why each requested permission is necessary
   3. The extension handles storage quota exceeded errors gracefully — user sees an informative message rather than a silent failure
   4. The extension is published on the Chrome Web Store and installable by anyone with the store link
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 06-01-PLAN.md — Storage error handling, version bump, privacy policy, and packaging
+- [ ] 06-02-PLAN.md — Deploy privacy policy and submit to Chrome Web Store
 
 ## Progress
 
@@ -117,4 +120,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 3. Service Worker and Settings | 2/2 | Complete | 2026-02-20 |
 | 4. Popup UI | 1/1 | Complete | 2026-02-20 |
 | 5. Differentiating Features | 0/3 | Planning complete | - |
-| 6. Chrome Web Store Submission | 0/? | Not started | - |
+| 6. Chrome Web Store Submission | 0/2 | Planning complete | - |
