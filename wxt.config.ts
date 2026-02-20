@@ -10,7 +10,7 @@ export default defineConfig({
     name: 'InvisibleUnicode',
     description: 'Detect and reveal hidden Unicode text on any web page',
     permissions: ['storage', 'activeTab', 'scripting'],
-    optional_permissions: ['<all_urls>'],
+    optional_host_permissions: ['<all_urls>'],
     content_security_policy: {
       extension_pages: "script-src 'self'; object-src 'self';",
     },
