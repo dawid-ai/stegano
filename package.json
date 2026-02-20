@@ -1,0 +1,34 @@
+{
+  "name": "invisible-unicode",
+  "description": "Detect and reveal hidden Unicode text on any web page",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "compile": "tsc --noEmit",
+    "postinstall": "wxt prepare",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.3",
+    "@tailwindcss/vite": "^4.2.0",
+    "@webext-core/fake-browser": "^1.3.4",
+    "eslint": "^9.39.2",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.0",
+    "vitest": "^4.0.18",
+    "wxt": "^0.20.17"
+  },
+  "dependencies": {
+    "@webext-core/messaging": "^2.3.0",
+    "preact": "^10.28.4"
+  }
+}
