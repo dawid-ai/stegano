@@ -3,14 +3,14 @@
  *
  * Storage area allocation:
  * - Settings: sync storage — syncs across devices, small data (well under 100KB)
- * - Snippets (Phase 5): local storage — per-device, 10MB limit
+ * - Snippets: sync storage — syncs across devices, ~15-18 snippets within 8KB per-item limit
  * - Scan results (Phase 2): session storage — vanish on browser close
  * - No usage stats or counters — nothing to track (per user decision)
  */
 
 import { storage } from 'wxt/utils/storage';
 import type { SensitivityLevel } from './charsets';
-import type { ScanMode } from './types';
+import type { ScanMode, Snippet } from './types';
 
 /** Current sensitivity level for detection */
 export const sensitivitySetting = storage.defineItem<SensitivityLevel>(
@@ -45,3 +45,32 @@ export const primarySnippetSetting = storage.defineItem<string>(
   'sync:primarySnippet',
   { fallback: '' },
 );
+
+/** Saved invisible Unicode snippets for quick-paste */
+export const snippetsSetting = storage.defineItem<Snippet[]>(
+  'sync:snippets',
+  { fallback: [] },
+);
+
+/** Add a new snippet to storage */
+export async function addSnippet(snippet: Snippet): Promise<void> {
+  const current = await snippetsSetting.getValue();
+  await snippetsSetting.setValue([...current, snippet]);
+}
+
+/** Update an existing snippet by ID */
+export async function updateSnippet(
+  id: string,
+  updates: Partial<Omit<Snippet, 'id'>>,
+): Promise<void> {
+  const current = await snippetsSetting.getValue();
+  await snippetsSetting.setValue(
+    current.map((s) => (s.id === id ? { ...s, ...updates } : s)),
+  );
+}
+
+/** Delete a snippet by ID */
+export async function deleteSnippet(id: string): Promise<void> {
+  const current = await snippetsSetting.getValue();
+  await snippetsSetting.setValue(current.filter((s) => s.id !== id));
+}
