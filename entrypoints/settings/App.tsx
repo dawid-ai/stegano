@@ -1,10 +1,14 @@
 import { useState, useEffect } from 'preact/hooks';
-import type { Snippet, SnippetShortcut } from '@/utils/types';
+import type { Snippet, SnippetShortcut, ScanMode } from '@/utils/types';
+import type { SensitivityLevel } from '@/utils/charsets';
 import {
   snippetsSetting,
   addSnippet,
   updateSnippet,
   deleteSnippet,
+  highlightColorSetting,
+  scanModeSetting,
+  sensitivitySetting,
 } from '@/utils/storage';
 import type { StorageResult } from '@/utils/storage';
 
@@ -72,6 +76,9 @@ export function App() {
   const [createForm, setCreateForm] = useState<SnippetFormData>(emptyForm);
   const [quotaWarning, setQuotaWarning] = useState(false);
   const [storageError, setStorageError] = useState<string | null>(null);
+  const [highlightColor, setHighlightColor] = useState('#ffeb3b');
+  const [scanMode, setScanMode] = useState<ScanMode>('onDemand');
+  const [sensitivity, setSensitivity] = useState<SensitivityLevel>('standard');
 
   /** Check a storage result and set/clear the error banner */
   function handleStorageResult(result: StorageResult): boolean {
@@ -83,17 +90,21 @@ export function App() {
     return true;
   }
 
-  // Load snippets on mount and watch for changes
+  // Load all settings on mount and watch for changes
   useEffect(() => {
     snippetsSetting.getValue().then(setSnippets);
-    const unwatch = snippetsSetting.watch((newVal) => {
+    highlightColorSetting.getValue().then(setHighlightColor);
+    scanModeSetting.getValue().then(setScanMode);
+    sensitivitySetting.getValue().then(setSensitivity);
+
+    const unwatchSnippets = snippetsSetting.watch((newVal) => {
       if (newVal) {
         setSnippets(newVal);
         setQuotaWarning(estimateSize(newVal) > QUOTA_WARNING_BYTES);
       }
     });
     return () => {
-      unwatch();
+      unwatchSnippets();
     };
   }, []);
 
@@ -182,6 +193,107 @@ export function App() {
             </button>
           </div>
         )}
+
+        {/* General Settings */}
+        <section class="mb-8 p-4 bg-white rounded-lg border border-gray-200">
+          <h2 class="text-sm font-medium text-gray-700 mb-4">
+            Scanner Settings
+          </h2>
+          <div class="flex flex-col gap-4">
+            {/* Scan Mode */}
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-medium text-gray-600">Scan Mode</label>
+              <select
+                value={scanMode}
+                onChange={(e) => {
+                  const val = (e.target as HTMLSelectElement).value as ScanMode;
+                  setScanMode(val);
+                  void scanModeSetting.setValue(val);
+                }}
+                class="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white"
+              >
+                <option value="onDemand">On-demand — scan when you click the button</option>
+                <option value="auto">Automatic — scan every page on load</option>
+              </select>
+              <p class="text-[11px] text-gray-400">
+                Auto mode requires the extension to have host permissions. You may be prompted to grant access.
+              </p>
+            </div>
+
+            {/* Sensitivity Level */}
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-medium text-gray-600">Detection Sensitivity</label>
+              <select
+                value={sensitivity}
+                onChange={(e) => {
+                  const val = (e.target as HTMLSelectElement).value as SensitivityLevel;
+                  setSensitivity(val);
+                  void sensitivitySetting.setValue(val);
+                }}
+                class="w-full max-w-xs px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white"
+              >
+                <option value="standard">Standard — Tags block, zero-width, AI watermarks</option>
+                <option value="thorough">Thorough — adds invisible operators, variation selectors</option>
+                <option value="paranoid">Paranoid — adds directional overrides, soft hyphens, all invisible chars</option>
+              </select>
+            </div>
+
+            {/* Highlight Color */}
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-medium text-gray-600">Highlight Color</label>
+              <div class="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={highlightColor}
+                  onInput={(e) => {
+                    const val = (e.target as HTMLInputElement).value;
+                    setHighlightColor(val);
+                    void highlightColorSetting.setValue(val);
+                  }}
+                  class="w-10 h-10 border border-gray-300 rounded cursor-pointer"
+                />
+                <div class="flex flex-col">
+                  <span class="text-xs text-gray-600">{highlightColor}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setHighlightColor('#ffeb3b');
+                      void highlightColorSetting.setValue('#ffeb3b');
+                    }}
+                    class="text-[11px] text-blue-600 hover:text-blue-800 text-left"
+                  >
+                    Reset to default (per-class colors)
+                  </button>
+                </div>
+              </div>
+              <p class="text-[11px] text-gray-400">
+                Default uses per-class colors: yellow for Tags block, orange for zero-width, pink for AI watermarks. Custom color overrides all classes.
+              </p>
+            </div>
+
+            {/* Keyboard Shortcuts Reference */}
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-medium text-gray-600">Keyboard Shortcuts</label>
+              <div class="text-xs text-gray-600 space-y-1">
+                <div class="flex justify-between max-w-xs">
+                  <span>Open popup</span>
+                  <kbd class="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-[11px]">Ctrl+Shift+U</kbd>
+                </div>
+                <div class="flex justify-between max-w-xs">
+                  <span>Toggle scan</span>
+                  <kbd class="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-[11px]">Alt+Shift+S</kbd>
+                </div>
+                <div class="flex justify-between max-w-xs">
+                  <span>Quick paste</span>
+                  <kbd class="px-1.5 py-0.5 bg-gray-100 border border-gray-300 rounded text-[11px]">Alt+Shift+V</kbd>
+                </div>
+              </div>
+              <p class="text-[11px] text-gray-400">
+                Customize these in <code>chrome://extensions/shortcuts</code>
+              </p>
+            </div>
+          </div>
+        </section>
 
         {/* Create Form */}
         <section class="mb-8 p-4 bg-white rounded-lg border border-gray-200">

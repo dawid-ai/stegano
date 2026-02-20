@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'preact/hooks';
+import { useState, useRef, useCallback, useEffect } from 'preact/hooks';
 import { browser } from 'wxt/browser';
 import { encode, decode } from '@/utils/codec';
 import { copyToClipboard } from '@/utils/clipboard';
@@ -13,8 +13,19 @@ export function App() {
   const [error, setError] = useState('');
   const [copied, setCopied] = useState<'idle' | 'success' | 'fail'>('idle');
   const [exportStatus, setExportStatus] = useState<'idle' | 'success' | 'empty' | 'fail'>('idle');
+  const [scanActive, setScanActive] = useState(false);
   const copyTimer = useRef<number>(0);
   const exportTimer = useRef<number>(0);
+
+  // Check if scan is active on current tab (badge text is non-empty)
+  useEffect(() => {
+    browser.tabs.query({ active: true, currentWindow: true }).then(([tab]) => {
+      if (!tab?.id) return;
+      browser.action.getBadgeText({ tabId: tab.id }).then((text) => {
+        setScanActive(text !== '');
+      });
+    });
+  }, []);
 
   async function handleExport() {
     clearTimeout(exportTimer.current);
@@ -76,6 +87,16 @@ export function App() {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
     if (!tab?.id) return;
 
+    if (scanActive) {
+      // Toggle OFF — clear highlights
+      try {
+        await sendMessage('clearScan', undefined, tab.id);
+      } catch { /* content script may be gone */ }
+      await browser.action.setBadgeText({ text: '', tabId: tab.id });
+      window.close();
+      return;
+    }
+
     // Inject content script if not already present
     try {
       await sendMessage('ping', undefined, tab.id);
@@ -104,7 +125,7 @@ export function App() {
       })
       .catch(() => {});
     window.close();
-  }, []);
+  }, [scanActive]);
 
   const handleOpenSettings = useCallback(() => {
     void browser.tabs.create({ url: browser.runtime.getURL('settings.html') });
@@ -160,12 +181,16 @@ export function App() {
         <button
           type="button"
           onClick={handleScanPage}
-          class="w-full py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 active:bg-indigo-800 transition-colors"
+          class={`w-full py-2.5 text-white text-sm font-medium rounded-md transition-colors ${
+            scanActive
+              ? 'bg-red-600 hover:bg-red-700 active:bg-red-800'
+              : 'bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800'
+          }`}
         >
-          Scan Page for Hidden Characters
+          {scanActive ? 'Clear Scan Highlights' : 'Scan Page for Hidden Characters'}
         </button>
         <p class="text-[10px] text-gray-400 text-center">
-          Or press <kbd class="px-1 py-0.5 bg-gray-200 text-gray-600 rounded text-[10px]">Alt+Shift+S</kbd> anytime without opening popup
+          Or press <kbd class="px-1 py-0.5 bg-gray-200 text-gray-600 rounded text-[10px]">Alt+Shift+S</kbd> to toggle scan without popup
         </p>
       </section>
 

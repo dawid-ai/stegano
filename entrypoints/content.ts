@@ -13,7 +13,7 @@
 
 import { onMessage } from '@/utils/messaging';
 import { findInvisibleChars, type ScanFinding } from '@/utils/scanner';
-import { highlightColorSetting, snippetsSetting } from '@/utils/storage';
+import { highlightColorSetting, sensitivitySetting, scanModeSetting, snippetsSetting } from '@/utils/storage';
 import type { Snippet } from '@/utils/types';
 
 /** Tags to skip when walking the DOM */
@@ -120,11 +120,11 @@ function clearAllHighlights(): void {
  * Scan a single text node and apply highlights if findings exist.
  * Returns the findings array for accumulation in allFindings.
  */
-function scanTextNode(textNode: Text, color: string | null): ScanFinding[] {
+function scanTextNode(textNode: Text, color: string | null, sensitivity: import('@/utils/charsets').SensitivityLevel = 'standard'): ScanFinding[] {
   const text = textNode.textContent;
   if (!text) return [];
 
-  const findings = findInvisibleChars(text, 'standard');
+  const findings = findInvisibleChars(text, sensitivity);
   if (findings.length === 0) return [];
 
   highlightFindings(textNode, findings, color);
@@ -134,7 +134,7 @@ function scanTextNode(textNode: Text, color: string | null): ScanFinding[] {
 /**
  * Start observing DOM mutations to scan dynamically added content.
  */
-function startObserving(color: string | null): void {
+function startObserving(color: string | null, sensitivity: import('@/utils/charsets').SensitivityLevel = 'standard'): void {
   if (observer) return;
 
   let pendingNodes: Node[] = [];
@@ -147,14 +147,14 @@ function startObserving(color: string | null): void {
 
     for (const node of nodes) {
       if (node.nodeType === Node.TEXT_NODE) {
-        const findings = scanTextNode(node as Text, color);
+        const findings = scanTextNode(node as Text, color, sensitivity);
         totalFindings += findings.length;
         allFindings.push(...findings);
       } else if (node.nodeType === Node.ELEMENT_NODE) {
         const walker = createScanWalker(node);
         let textNode: Node | null;
         while ((textNode = walker.nextNode())) {
-          const findings = scanTextNode(textNode as Text, color);
+          const findings = scanTextNode(textNode as Text, color, sensitivity);
           totalFindings += findings.length;
           allFindings.push(...findings);
         }
@@ -206,6 +206,7 @@ function stopObserving(): void {
  */
 async function performFullScan(): Promise<{ count: number }> {
   const userColor = await highlightColorSetting.getValue();
+  const sensitivity = await sensitivitySetting.getValue();
   // If user has custom color (not the default), use it for all classes; otherwise per-class
   const color = userColor.toLowerCase() === DEFAULT_HIGHLIGHT_COLOR ? null : userColor;
   scanActive = true;
@@ -222,13 +223,13 @@ async function performFullScan(): Promise<{ count: number }> {
   }
 
   for (const textNode of textNodes) {
-    const findings = scanTextNode(textNode, color);
+    const findings = scanTextNode(textNode, color, sensitivity);
     totalFindings += findings.length;
     allFindings.push(...findings);
   }
 
   // Start observing for dynamic content
-  startObserving(color);
+  startObserving(color, sensitivity);
 
   return { count: totalFindings };
 }
@@ -294,6 +295,13 @@ export default defineContentScript({
         url: window.location.href,
         timestamp: new Date().toISOString(),
       };
+    });
+
+    // Auto-scan on page load if scan mode is 'auto' (SCAN-07)
+    scanModeSetting.getValue().then((mode) => {
+      if (mode === 'auto') {
+        performFullScan().catch(() => {});
+      }
     });
 
     // Reactively update highlight color when setting changes (SETT-01)
