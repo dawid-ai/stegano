@@ -3,6 +3,7 @@
  *
  * Handles:
  * - browser.action.onClicked toggle (scan on / scan off)
+ * - browser.commands.onCommand for keyboard shortcuts (trigger-scan, quick-paste)
  * - Content script injection on first click
  * - Badge management (finding count, checkmark, clear on navigation)
  * - Restricted URL filtering (chrome://, about:, etc.)
@@ -10,6 +11,7 @@
 
 import { browser } from 'wxt/browser';
 import { sendMessage } from '@/utils/messaging';
+import { primarySnippetSetting, scanModeSetting } from '@/utils/storage';
 
 /** URLs where content script injection is not allowed */
 const RESTRICTED_PREFIXES = ['chrome://', 'about:', 'chrome-extension://'];
@@ -50,43 +52,89 @@ function updateBadge(tabId: number, count: number): void {
   }
 }
 
+/**
+ * Shared scan toggle logic used by both action.onClicked and trigger-scan command.
+ * Injects content script if needed, starts or clears scan, updates badge.
+ */
+async function handleScanToggle(tabId: number, url: string | undefined): Promise<void> {
+  if (isRestrictedUrl(url)) return;
+
+  const badgeText = await browser.action.getBadgeText({ tabId });
+
+  if (badgeText !== '') {
+    // Scan is active — toggle OFF
+    try {
+      await sendMessage('clearScan', undefined, tabId);
+    } catch {
+      // Content script may have been unloaded — ignore
+    }
+    await browser.action.setBadgeText({ text: '', tabId });
+  } else {
+    // No scan active — toggle ON
+    try {
+      // Try to ping existing content script
+      await sendMessage('ping', undefined, tabId);
+    } catch {
+      // Content script not injected — inject it
+      await browser.scripting.executeScript({
+        target: { tabId },
+        files: ['/content-scripts/content.js'],
+      });
+    }
+
+    try {
+      const result = await sendMessage('startScan', undefined, tabId);
+      updateBadge(tabId, result.count);
+    } catch (err) {
+      console.error('InvisibleUnicode: scan failed', err);
+    }
+  }
+}
+
+/**
+ * Copy the primary snippet to the clipboard via content script injection.
+ * Fails silently on restricted pages or when no snippet is set.
+ */
+async function handleQuickPaste(tabId: number): Promise<void> {
+  const snippet = await primarySnippetSetting.getValue();
+  if (!snippet) return;
+
+  try {
+    await browser.scripting.executeScript({
+      target: { tabId },
+      func: (text: string) => navigator.clipboard.writeText(text),
+      args: [snippet],
+    });
+  } catch {
+    // Clipboard write may fail on restricted pages or if page doesn't have focus
+  }
+}
+
 export default defineBackground(() => {
   // Handle extension icon click — toggle scan on/off
   browser.action.onClicked.addListener(async (tab) => {
     if (!tab.id) return;
-    if (isRestrictedUrl(tab.url)) return;
+    await handleScanToggle(tab.id, tab.url);
+  });
 
-    const tabId = tab.id;
-    const badgeText = await browser.action.getBadgeText({ tabId });
+  // Handle keyboard shortcut commands
+  browser.commands.onCommand.addListener(async (command, tab) => {
+    if (!tab?.id) return;
 
-    if (badgeText !== '') {
-      // Scan is active — toggle OFF
-      try {
-        await sendMessage('clearScan', undefined, tabId);
-      } catch {
-        // Content script may have been unloaded — ignore
-      }
-      await browser.action.setBadgeText({ text: '', tabId });
-    } else {
-      // No scan active — toggle ON
-      try {
-        // Try to ping existing content script
-        await sendMessage('ping', undefined, tabId);
-      } catch {
-        // Content script not injected — inject it
-        await browser.scripting.executeScript({
-          target: { tabId },
-          files: ['/content-scripts/content.js'],
-        });
-      }
-
-      try {
-        const result = await sendMessage('startScan', undefined, tabId);
-        updateBadge(tabId, result.count);
-      } catch (err) {
-        console.error('InvisibleUnicode: scan failed', err);
-      }
+    switch (command) {
+      case 'trigger-scan':
+        await handleScanToggle(tab.id, tab.url);
+        break;
+      case 'quick-paste':
+        await handleQuickPaste(tab.id);
+        break;
     }
+  });
+
+  // Log scan mode on install to confirm storage is accessible from service worker
+  browser.runtime.onInstalled.addListener(async () => {
+    const mode = await scanModeSetting.getValue();
+    console.log(`InvisibleUnicode: installed, scan mode = ${mode}`);
   });
 
   // Clear badge when tab navigates to a new page
