@@ -1,6 +1,9 @@
 import { useState, useRef } from 'preact/hooks';
+import { browser } from 'wxt/browser';
 import { encode, decode } from '@/utils/codec';
 import { copyToClipboard } from '@/utils/clipboard';
+import { sendMessage } from '@/utils/messaging';
+import { buildScanReport } from '@/utils/export';
 
 export function App() {
   const [encodeInput, setEncodeInput] = useState('');
@@ -9,7 +12,31 @@ export function App() {
   const [decodeOutput, setDecodeOutput] = useState('');
   const [error, setError] = useState('');
   const [copied, setCopied] = useState<'idle' | 'success' | 'fail'>('idle');
+  const [exportStatus, setExportStatus] = useState<'idle' | 'success' | 'empty' | 'fail'>('idle');
   const copyTimer = useRef<number>(0);
+  const exportTimer = useRef<number>(0);
+
+  async function handleExport() {
+    clearTimeout(exportTimer.current);
+    try {
+      const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+      if (!tab?.id) { setExportStatus('fail'); return; }
+
+      const response = await sendMessage('getFindings', undefined, tab.id);
+      if (!response || response.findings.length === 0) {
+        setExportStatus('empty');
+        exportTimer.current = window.setTimeout(() => setExportStatus('idle'), 2000);
+        return;
+      }
+
+      const report = buildScanReport(response);
+      const ok = await copyToClipboard(JSON.stringify(report, null, 2));
+      setExportStatus(ok ? 'success' : 'fail');
+    } catch {
+      setExportStatus('fail');
+    }
+    exportTimer.current = window.setTimeout(() => setExportStatus('idle'), 2000);
+  }
 
   function handleEncode() {
     try {
@@ -49,13 +76,36 @@ export function App() {
     <div class="flex flex-col gap-4 p-4 bg-gray-50 min-h-full text-sm">
       <div class="flex items-center justify-between">
         <h1 class="text-base font-semibold text-gray-800">InvisibleUnicode</h1>
-        <button
-          type="button"
-          onClick={handleClear}
-          class="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
-        >
-          Clear All
-        </button>
+        <div class="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={handleExport}
+            class={`text-xs px-2 py-1 rounded transition-colors ${
+              exportStatus === 'success'
+                ? 'text-green-700 bg-green-100'
+                : exportStatus === 'empty'
+                  ? 'text-amber-700 bg-amber-100'
+                  : exportStatus === 'fail'
+                    ? 'text-red-700 bg-red-100'
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {exportStatus === 'success'
+              ? 'Copied!'
+              : exportStatus === 'empty'
+                ? 'No scan results'
+                : exportStatus === 'fail'
+                  ? 'Export failed'
+                  : 'Export JSON'}
+          </button>
+          <button
+            type="button"
+            onClick={handleClear}
+            class="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
+          >
+            Clear All
+          </button>
+        </div>
       </div>
 
       {/* Encode Section */}
