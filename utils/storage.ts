@@ -46,22 +46,6 @@ export const sensitivitySetting = storage.defineItem<SensitivityLevel>(
   { fallback: 'standard' },
 );
 
-/**
- * Whether to wrap encoded output with Tags block wrapper characters.
- * - true: output wrapped with U+E0001 (begin) and U+E007F (cancel)
- * - false: raw output without wrappers (default — better for copy-paste)
- */
-export const wrapperEnabledSetting = storage.defineItem<boolean>(
-  'sync:wrapperEnabled',
-  { fallback: false },
-);
-
-/** Highlight color for detected hidden characters in the page */
-export const highlightColorSetting = storage.defineItem<string>(
-  'sync:highlightColor',
-  { fallback: '#ffeb3b' },
-);
-
 /** Theme preference: dark (default) or light */
 export const themeSetting = storage.defineItem<'dark' | 'light'>(
   'sync:theme',

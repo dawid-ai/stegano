@@ -1,3 +1,11 @@
+/**
+ * ESLint 9 flat config for the Stegano extension.
+ *
+ * Enforces TypeScript recommended rules and bans all network APIs
+ * (fetch, XMLHttpRequest, WebSocket, EventSource, sendBeacon) to
+ * guarantee the extension never makes outbound requests.
+ */
+
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(

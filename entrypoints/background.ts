@@ -111,9 +111,13 @@ async function handleQuickPaste(tabId: number): Promise<void> {
 }
 
 export default defineBackground(() => {
-  // Handle extension icon click — toggle scan on/off
-  // Note: This only fires if popup is NOT registered. Currently dead code
-  // since default_popup is set, but kept for if popup is ever removed.
+  /**
+   * Handle extension icon click -- toggle scan on/off.
+   *
+   * This listener only fires when no popup is registered (default_popup unset).
+   * Currently inactive because the popup is set, but retained intentionally so
+   * that removing the popup automatically re-enables click-to-scan behavior.
+   */
   browser.action.onClicked.addListener(async (tab) => {
     if (!tab.id) return;
     await handleScanToggle(tab.id, tab.url);
@@ -144,7 +148,7 @@ export default defineBackground(() => {
   // Log scan mode on install to confirm storage is accessible from service worker
   browser.runtime.onInstalled.addListener(async () => {
     const mode = await scanModeSetting.getValue();
-    console.log(`Stegano: installed, scan mode = ${mode}`);
+    void mode; // Confirm storage is accessible from service worker on install
   });
 
   // Clear badge when tab navigates to a new page

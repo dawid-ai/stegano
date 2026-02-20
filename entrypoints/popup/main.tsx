@@ -1,3 +1,7 @@
+/**
+ * Popup entry point. Mounts the Preact App component into the DOM.
+ */
+
 import { render } from 'preact';
 import { App } from './App';
 import './style.css';

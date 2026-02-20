@@ -29,14 +29,3 @@ export interface Snippet {
   shortcut?: SnippetShortcut;
 }
 
-/** Result of scanning a text node for hidden Unicode characters */
-export interface ScanMatch {
-  /** The hidden character found */
-  char: string;
-  /** Unicode code point (e.g., 0xE0001) */
-  codePoint: number;
-  /** Index within the text node */
-  index: number;
-  /** Human-readable name of the character range */
-  rangeName: string;
-}

@@ -1,3 +1,11 @@
+/**
+ * WXT build configuration for the Stegano Chrome extension.
+ *
+ * Configures Vite plugins (Preact, Tailwind CSS 4), aliases the
+ * webextension-polyfill to a minimal Chrome MV3 shim, and declares
+ * the extension manifest (permissions, commands, options UI, CSP).
+ */
+
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { defineConfig } from 'wxt';

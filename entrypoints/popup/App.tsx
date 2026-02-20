@@ -1,3 +1,13 @@
+/**
+ * Popup UI for the Stegano extension.
+ *
+ * Provides an encode/decode tool for invisible Unicode steganography,
+ * a scan trigger button that toggles page scanning on/off, an export
+ * button that copies scan findings as JSON, and a settings link.
+ *
+ * @module popup/App
+ */
+
 import { useState, useRef, useCallback, useEffect } from 'preact/hooks';
 import { browser } from 'wxt/browser';
 import { encode, decode } from '@/utils/codec';
@@ -39,6 +49,7 @@ export function App() {
     });
   }, []);
 
+  /** Export scan findings as JSON to the clipboard. Shows status feedback. */
   async function handleExport() {
     clearTimeout(exportTimer.current);
     try {
@@ -61,6 +72,7 @@ export function App() {
     exportTimer.current = window.setTimeout(() => setExportStatus('idle'), 2000);
   }
 
+  /** Encode the input text into invisible Tags block Unicode. */
   function handleEncode() {
     try {
       const result = encode(encodeInput);
@@ -72,11 +84,13 @@ export function App() {
     }
   }
 
+  /** Live-decode pasted invisible text as the user types. */
   function handleDecodeInput(value: string) {
     setDecodeInput(value);
     setDecodeOutput(decode(value));
   }
 
+  /** Copy the encoded output to the clipboard with success/fail feedback. */
   async function handleCopy() {
     if (!encodeOutput) return;
     clearTimeout(copyTimer.current);
@@ -85,6 +99,7 @@ export function App() {
     copyTimer.current = window.setTimeout(() => setCopied('idle'), 2000);
   }
 
+  /** Toggle page scan on/off: inject content script, start scan, close popup. */
   const handleScanPage = useCallback(async () => {
     const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
     if (!tab?.id) return;
@@ -129,6 +144,7 @@ export function App() {
     window.close();
   }, [scanActive]);
 
+  /** Open the settings page in a new tab and close the popup. */
   const handleOpenSettings = useCallback(() => {
     void browser.tabs.create({ url: browser.runtime.getURL('settings.html') });
     window.close();

@@ -1,3 +1,13 @@
+/**
+ * Settings page UI for the Stegano extension.
+ *
+ * Provides controls for theme selection, scan mode, detection sensitivity,
+ * per-class highlight colors, keyboard shortcut reference, and a full
+ * snippet library manager (create, edit, delete, with keyboard shortcuts).
+ *
+ * @module settings/App
+ */
+
 import { useState, useEffect } from 'preact/hooks';
 import type { Snippet, SnippetShortcut, ScanMode } from '@/utils/types';
 import type { SensitivityLevel } from '@/utils/charsets';
@@ -51,6 +61,7 @@ const emptyForm: SnippetFormData = {
   shortcutKey: '',
 };
 
+/** Convert form data to a SnippetShortcut, or undefined if no key is set. */
 function formToShortcut(form: SnippetFormData): SnippetShortcut | undefined {
   if (!form.shortcutKey) return undefined;
   return {
@@ -61,6 +72,7 @@ function formToShortcut(form: SnippetFormData): SnippetShortcut | undefined {
   };
 }
 
+/** Convert a saved Snippet into editable form data. */
 function snippetToForm(snippet: Snippet): SnippetFormData {
   return {
     name: snippet.name,
@@ -125,12 +137,14 @@ export function App() {
     };
   }, []);
 
+  /** Apply a theme change to both state and persistent storage. */
   function handleThemeChange(newTheme: 'dark' | 'light') {
     setTheme(newTheme);
     document.documentElement.classList.toggle('dark', newTheme === 'dark');
     void themeSetting.setValue(newTheme);
   }
 
+  /** Create a new snippet from the create form and save to storage. */
   async function handleCreate() {
     if (!createForm.name.trim() || !createForm.content) return;
     const snippet: Snippet = {
@@ -150,6 +164,7 @@ export function App() {
     setEditForm(snippetToForm(snippet));
   }
 
+  /** Save changes to the currently edited snippet. */
   async function handleSaveEdit() {
     if (!editingId || !editForm.name.trim() || !editForm.content) return;
     const result = await updateSnippet(editingId, {
@@ -168,6 +183,7 @@ export function App() {
     setEditForm(emptyForm);
   }
 
+  /** Delete a snippet by ID after user confirmation. */
   async function handleDelete(id: string) {
     if (!confirm('Delete this snippet?')) return;
     const result = await deleteSnippet(id);
