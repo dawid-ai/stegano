@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-19)
 
 **Core value:** Detect and reveal hidden Unicode text on any web page — protecting against prompt injection and hidden content attacks
-**Current focus:** Phase 2 — Scanner
+**Current focus:** Phase 3 — Service Worker and Settings
 
 ## Current Position
 
-Phase: 2 of 6 (Scanner)
-Plan: 1 of 2 in current phase
+Phase: 3 of 6 (Service Worker and Settings)
+Plan: 2 of 2 in current phase
 Status: Executing
-Last activity: 2026-02-20 — Completed 02-01 scanner pure functions (TDD)
+Last activity: 2026-02-20 — Completed 03-02 reactive highlight color update
 
-Progress: [███░░░░░░░] 25%
+Progress: [████░░░░░░] 33%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
-- Average duration: 6 min
-- Total execution time: 0.28 hours
+- Total plans completed: 4
+- Average duration: 5 min
+- Total execution time: 0.30 hours
 
 **By Phase:**
 
@@ -29,9 +29,10 @@ Progress: [███░░░░░░░] 25%
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 14 min | 7 min |
 | 02-scanner | 1 | 3 min | 3 min |
+| 03-service-worker-and-settings | 1 | 1 min | 1 min |
 
 **Recent Trend:**
-- Last 5 plans: 10min, 4min, 3min
+- Last 5 plans: 10min, 4min, 3min, 1min
 - Trend: accelerating
 
 *Updated after each plan completion*
@@ -57,6 +58,7 @@ Recent decisions affecting current work:
 - [02-01]: Used regex.exec() loop (not for...of) for UTF-16 offset compatibility with Text.splitText()
 - [02-01]: Adjacent Tags block matches merged in second pass after collecting all raw regex matches
 - [02-01]: Messaging ProtocolMap uses function syntax (not deprecated ProtocolWithReturn)
+- [03-02]: No scan mode watch needed in content script — SETT-02 already satisfied by sync storage persistence
 
 ### Pending Todos
 
@@ -69,5 +71,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 02-01-PLAN.md (scanner pure functions + messaging)
-Resume file: .planning/phases/02-scanner/02-01-SUMMARY.md
+Stopped at: Completed 03-02-PLAN.md (reactive highlight color update)
+Resume file: .planning/phases/03-service-worker-and-settings/03-02-SUMMARY.md

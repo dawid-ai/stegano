@@ -39,7 +39,7 @@
 
 ### Settings
 
-- [ ] **SETT-01**: User can configure highlight color/style for detected invisible characters
+- [x] **SETT-01**: User can configure highlight color/style for detected invisible characters
 - [ ] **SETT-02**: User can configure scan mode preference (persists across sessions)
 
 ### Platform
@@ -96,7 +96,7 @@
 | KEYS-01 | Phase 3 | Pending |
 | KEYS-02 | Phase 3 | Pending |
 | KEYS-03 | Phase 3 | Pending |
-| SETT-01 | Phase 3 | Pending |
+| SETT-01 | Phase 3 | Complete |
 | SETT-02 | Phase 3 | Pending |
 | PLAT-01 | Phase 1 | Complete |
 | PLAT-02 | Phase 1 | Complete |
