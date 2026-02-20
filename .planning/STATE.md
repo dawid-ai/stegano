@@ -90,7 +90,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 1 | Add dark mode, fix settings UI, remove broken Clear All, add per-class color selectors, show zero-width char codes | 2026-02-20 | 07b7a25 | [1-add-dark-mode-fix-settings-ui-remove-bro](./quick/1-add-dark-mode-fix-settings-ui-remove-bro/) |
-| 2 | Code cleanup, JSDoc documentation, README, LICENSE, open-source package.json | 2026-02-20 | 0adffce | [2-code-cleanup-documentation-readme-and-op](./quick/2-code-cleanup-documentation-readme-and-op/) |
+| 2 | Code cleanup, JSDoc documentation, README, LICENSE, open-source package.json | 2026-02-20 | 75aadc6 | [2-code-cleanup-documentation-readme-and-op](./quick/2-code-cleanup-documentation-readme-and-op/) |
 
 ## Session Continuity
 
