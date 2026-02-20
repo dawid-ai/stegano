@@ -37,6 +37,7 @@ type MessageMap = {
   startScan: { data: undefined; response: ScanResult };
   clearScan: { data: undefined; response: void };
   getFindings: { data: undefined; response: FindingsResponse | null };
+  triggerScan: { data: undefined; response: void };
 };
 
 type MessageType = keyof MessageMap;

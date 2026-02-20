@@ -1,4 +1,4 @@
-import { useState, useRef } from 'preact/hooks';
+import { useState, useRef, useCallback } from 'preact/hooks';
 import { browser } from 'wxt/browser';
 import { encode, decode } from '@/utils/codec';
 import { copyToClipboard } from '@/utils/clipboard';
@@ -72,6 +72,16 @@ export function App() {
     clearTimeout(copyTimer.current);
   }
 
+  const handleScanPage = useCallback(async () => {
+    await sendMessage('triggerScan', undefined);
+    window.close();
+  }, []);
+
+  const handleOpenSettings = useCallback(() => {
+    browser.runtime.openOptionsPage();
+    window.close();
+  }, []);
+
   return (
     <div class="flex flex-col gap-4 p-4 bg-gray-50 min-h-full text-sm">
       <div class="flex items-center justify-between">
@@ -105,8 +115,32 @@ export function App() {
           >
             Clear All
           </button>
+          <button
+            type="button"
+            onClick={handleOpenSettings}
+            title="Settings"
+            class="text-xs text-gray-500 hover:text-gray-700 px-2 py-1 rounded hover:bg-gray-200 transition-colors"
+          >
+            &#9881;
+          </button>
         </div>
       </div>
+
+      {/* Scan Page Action */}
+      <section class="flex flex-col gap-1">
+        <button
+          type="button"
+          onClick={handleScanPage}
+          class="w-full py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 active:bg-indigo-800 transition-colors"
+        >
+          Scan Page for Hidden Characters
+        </button>
+        <p class="text-[10px] text-gray-400 text-center">
+          Or press <kbd class="px-1 py-0.5 bg-gray-200 text-gray-600 rounded text-[10px]">Alt+Shift+S</kbd> anytime without opening popup
+        </p>
+      </section>
+
+      <hr class="border-gray-200" />
 
       {/* Encode Section */}
       <section class="flex flex-col gap-2">

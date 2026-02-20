@@ -34,6 +34,10 @@ export default defineConfig({
         description: 'Paste primary invisible text snippet',
       },
     },
+    options_ui: {
+      page: 'settings.html',
+      open_in_tab: true,
+    },
     content_security_policy: {
       extension_pages: "script-src 'self'; object-src 'self';",
     },

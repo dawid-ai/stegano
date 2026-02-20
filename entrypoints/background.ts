@@ -10,7 +10,7 @@
  */
 
 import { browser } from 'wxt/browser';
-import { sendMessage } from '@/utils/messaging';
+import { onMessage, sendMessage } from '@/utils/messaging';
 import { primarySnippetSetting, scanModeSetting } from '@/utils/storage';
 
 /** URLs where content script injection is not allowed */
@@ -112,9 +112,19 @@ async function handleQuickPaste(tabId: number): Promise<void> {
 
 export default defineBackground(() => {
   // Handle extension icon click — toggle scan on/off
+  // Note: This only fires if popup is NOT registered. Currently dead code
+  // since default_popup is set, but kept for if popup is ever removed.
   browser.action.onClicked.addListener(async (tab) => {
     if (!tab.id) return;
     await handleScanToggle(tab.id, tab.url);
+  });
+
+  // Handle triggerScan message from popup — popup sends this then closes itself
+  onMessage('triggerScan', async () => {
+    const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+    if (tab?.id) {
+      await handleScanToggle(tab.id, tab.url);
+    }
   });
 
   // Handle keyboard shortcut commands
