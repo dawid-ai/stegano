@@ -31,7 +31,7 @@ Progress: [████████░░] 80%
 | 02-scanner | 1 | 3 min | 3 min |
 | 03-service-worker-and-settings | 2 | 3 min | 1.5 min |
 | 04-popup-ui | 1 | 2 min | 2 min |
-| 05-differentiating-features | 2 | 6 min | 3 min |
+| 05-differentiating-features | 3 | 9 min | 3 min |
 
 **Recent Trend:**
 - Last 5 plans: 1min, 2min, 2min, 3min, 3min
@@ -66,6 +66,9 @@ Recent decisions affecting current work:
 - [04-01]: Encode is button-triggered (can throw), decode is live on input (never throws)
 - [04-01]: Encoded output textarea uses text-transparent since Tags block chars are invisible
 - [04-01]: Single Clear All button in header rather than per-section clear buttons
+- [05-01]: Conservative watermark set excludes U+00A0 (too many false positives from nbsp)
+- [05-01]: Watermark findings use named labels (e.g., [Narrow No-Break Space]) not hex codes
+- [05-01]: Per-class colors: yellow=tags, orange=zerowidth, pink=watermark; custom color overrides all
 - [05-02]: Used sync storage for snippets (not local) per prior decision for cross-device sync
 - [05-02]: Alt+Shift pre-checked in shortcut configurator per prior keyboard shortcut convention
 
@@ -80,5 +83,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 05-02-PLAN.md (Snippet Storage & Settings Page)
-Resume file: .planning/phases/05-differentiating-features/05-02-SUMMARY.md
+Stopped at: Completed 05-01-PLAN.md (AI Watermark Detection)
+Resume file: .planning/phases/05-differentiating-features/05-01-SUMMARY.md

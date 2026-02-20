@@ -17,10 +17,10 @@
 
 - [x] **SCAN-01**: Extension scans current page DOM for invisible Unicode characters (Tags block U+E0000-E007F)
 - [x] **SCAN-02**: Extension detects zero-width characters (U+200B-U+200F, U+200C, U+200D, U+FEFF)
-- [ ] **SCAN-03**: Extension detects AI watermark characters (U+202F narrow no-break space and related LLM patterns)
+- [x] **SCAN-03**: Extension detects AI watermark characters (U+202F narrow no-break space and related LLM patterns)
 - [x] **SCAN-04**: Detected invisible text is replaced inline with decoded content on a highlighted background
 - [ ] **SCAN-05**: Extension icon badge shows count of hidden characters found on current page
-- [ ] **SCAN-06**: Scanner discriminates between Tags block, zero-width, and AI watermark character classes
+- [x] **SCAN-06**: Scanner discriminates between Tags block, zero-width, and AI watermark character classes
 - [x] **SCAN-07**: User can configure scan mode: always-on, on-demand, or badge-only
 - [ ] **SCAN-08**: User can toggle highlights on/off without page reload (non-destructive)
 - [ ] **SCAN-09**: User can export scan results as JSON report (clipboard or download)
@@ -83,10 +83,10 @@
 | CONV-05 | Phase 4 | Complete |
 | SCAN-01 | Phase 2 | Complete |
 | SCAN-02 | Phase 2 | Complete |
-| SCAN-03 | Phase 5 | Pending |
+| SCAN-03 | Phase 5 | Complete |
 | SCAN-04 | Phase 2 | Complete |
 | SCAN-05 | Phase 2 | Pending |
-| SCAN-06 | Phase 5 | Pending |
+| SCAN-06 | Phase 5 | Complete |
 | SCAN-07 | Phase 2 | Complete |
 | SCAN-08 | Phase 2 | Pending |
 | SCAN-09 | Phase 5 | Pending |
