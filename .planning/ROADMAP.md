@@ -88,7 +88,11 @@ Plans:
   3. Scanner identifies AI watermark characters (U+202F and related patterns) and labels them distinctly from Tags block and zero-width characters in the results
   4. Scanner results display clearly discriminates between the three character classes (Tags block, zero-width, AI watermark) so the user knows what type of hidden content was found
   5. User can export scan results as a JSON report via clipboard copy or file download
-**Plans**: TBD
+**Plans:** 3 plans
+Plans:
+- [ ] 05-01-PLAN.md — AI watermark detection and per-class highlight colors
+- [ ] 05-02-PLAN.md — Snippet data model, storage CRUD, and settings page UI
+- [ ] 05-03-PLAN.md — Snippet paste-via-shortcut and scan result JSON export
 
 ### Phase 6: Chrome Web Store Submission
 **Goal**: The extension passes Chrome Web Store review and is publicly available for installation
@@ -112,5 +116,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 2. Scanner | 2/2 | Complete | 2026-02-20 |
 | 3. Service Worker and Settings | 2/2 | Complete | 2026-02-20 |
 | 4. Popup UI | 1/1 | Complete | 2026-02-20 |
-| 5. Differentiating Features | 0/? | Not started | - |
+| 5. Differentiating Features | 0/3 | Planning complete | - |
 | 6. Chrome Web Store Submission | 0/? | Not started | - |
