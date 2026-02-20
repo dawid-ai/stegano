@@ -1,5 +1,5 @@
 /**
- * Background service worker for InvisibleUnicode extension.
+ * Background service worker for Stegano extension.
  *
  * Handles:
  * - browser.action.onClicked toggle (scan on / scan off)
@@ -86,7 +86,7 @@ async function handleScanToggle(tabId: number, url: string | undefined): Promise
       const result = await sendMessage('startScan', undefined, tabId);
       updateBadge(tabId, result.count);
     } catch (err) {
-      console.error('InvisibleUnicode: scan failed', err);
+      console.error('Stegano: scan failed', err);
     }
   }
 }
@@ -144,7 +144,7 @@ export default defineBackground(() => {
   // Log scan mode on install to confirm storage is accessible from service worker
   browser.runtime.onInstalled.addListener(async () => {
     const mode = await scanModeSetting.getValue();
-    console.log(`InvisibleUnicode: installed, scan mode = ${mode}`);
+    console.log(`Stegano: installed, scan mode = ${mode}`);
   });
 
   // Clear badge when tab navigates to a new page

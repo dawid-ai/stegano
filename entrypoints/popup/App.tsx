@@ -135,7 +135,7 @@ export function App() {
   return (
     <div class="flex flex-col gap-4 p-4 bg-gray-50 min-h-full text-sm">
       <div class="flex items-center justify-between">
-        <h1 class="text-base font-semibold text-gray-800">InvisibleUnicode</h1>
+        <h1 class="text-base font-semibold text-gray-800">Stegano</h1>
         <div class="flex items-center gap-1">
           <button
             type="button"
@@ -276,6 +276,18 @@ export function App() {
           />
         )}
       </section>
+
+      {/* Footer */}
+      <div class="text-center pt-1">
+        <a
+          href="https://dawid.ai/stegano"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-[10px] text-gray-400 hover:text-blue-500 transition-colors"
+        >
+          dawid.ai/stegano
+        </a>
+      </div>
     </div>
   );
 }

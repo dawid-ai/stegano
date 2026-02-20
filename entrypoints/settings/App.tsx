@@ -164,10 +164,10 @@ export function App() {
         {/* Header */}
         <div class="mb-6">
           <h1 class="text-xl font-semibold text-gray-800">
-            InvisibleUnicode Settings
+            Stegano Settings
           </h1>
           <p class="text-xs text-gray-500 mt-1">
-            Manage your saved invisible Unicode snippets
+            Configure scanning, manage snippets, and customize detection
           </p>
         </div>
 

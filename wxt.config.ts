@@ -16,8 +16,9 @@ export default defineConfig({
     },
   }),
   manifest: {
-    name: 'InvisibleUnicode',
-    description: 'Detect and reveal hidden Unicode text on any web page',
+    name: 'Stegano',
+    description: 'AI Red Team tool — hide and detect invisible Unicode on any web page. Test prompt injection, find ASCII smuggling, reveal hidden text.',
+    homepage_url: 'https://dawid.ai/stegano',
     action: {},
     permissions: ['storage', 'activeTab', 'scripting'],
     optional_host_permissions: ['<all_urls>'],

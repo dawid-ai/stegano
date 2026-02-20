@@ -1,6 +1,6 @@
 {
-  "name": "invisible-unicode",
-  "description": "Detect and reveal hidden Unicode text on any web page",
+  "name": "stegano",
+  "description": "AI Red Team tool — hide and detect invisible Unicode on any web page. Test prompt injection, find ASCII smuggling, reveal hidden text.",
   "private": true,
   "version": "1.0.0",
   "type": "module",
