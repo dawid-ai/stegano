@@ -39,3 +39,9 @@ export const scanModeSetting = storage.defineItem<ScanMode>(
   'sync:scanMode',
   { fallback: 'onDemand' },
 );
+
+/** Primary invisible text snippet for quick-paste (KEYS-03). Phase 5 adds full snippet library. */
+export const primarySnippetSetting = storage.defineItem<string>(
+  'sync:primarySnippet',
+  { fallback: '' },
+);

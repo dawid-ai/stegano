@@ -21,6 +21,19 @@ export default defineConfig({
     action: {},
     permissions: ['storage', 'activeTab', 'scripting'],
     optional_host_permissions: ['<all_urls>'],
+    commands: {
+      _execute_action: {
+        suggested_key: { default: 'Ctrl+Shift+U', mac: 'Command+Shift+U' },
+      },
+      'trigger-scan': {
+        suggested_key: { default: 'Alt+Shift+S', mac: 'Command+Shift+S' },
+        description: 'Scan page for invisible characters',
+      },
+      'quick-paste': {
+        suggested_key: { default: 'Alt+Shift+V', mac: 'Command+Shift+V' },
+        description: 'Paste primary invisible text snippet',
+      },
+    },
     content_security_policy: {
       extension_pages: "script-src 'self'; object-src 'self';",
     },
