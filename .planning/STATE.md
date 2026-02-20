@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 ## Current Position
 
 Phase: 1 of 6 (Foundation)
-Plan: 0 of ? in current phase
-Status: Ready to plan
-Last activity: 2026-02-19 — Roadmap created, phases derived from requirements
+Plan: 1 of 2 in current phase
+Status: Executing
+Last activity: 2026-02-20 — Completed 01-01 project scaffold
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█░░░░░░░░░] 8%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0
-- Average duration: —
-- Total execution time: 0 hours
+- Total plans completed: 1
+- Average duration: 10 min
+- Total execution time: 0.17 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 01-foundation | 1 | 10 min | 10 min |
 
 **Recent Trend:**
-- Last 5 plans: —
-- Trend: —
+- Last 5 plans: 10min
+- Trend: baseline
 
 *Updated after each plan completion*
 
@@ -45,6 +45,11 @@ Recent decisions affecting current work:
 - [Roadmap]: Permission model locked as activeTab for on-demand; all_urls as optional runtime permission for auto-scan — cannot be retrofitted, must be Phase 1 decision
 - [Roadmap]: Stack decided — WXT 0.20.17, Preact, TypeScript, Tailwind CSS 4.x, @webext-core/messaging and @webext-core/storage
 - [Roadmap]: AI watermark character patterns (Phase 5) require empirical validation before implementation — single LOW-confidence source, validate as Phase 5 spike
+- [01-01]: Used optional_host_permissions (not optional_permissions) for all_urls in MV3 manifest
+- [01-01]: Used wxt/utils/storage import path (not wxt/storage) for WXT 0.20.17 API
+- [01-01]: Used hoisted node-linker (.npmrc) to work around pnpm Windows symlink bug
+- [01-01]: ESLint 9 pinned for wxt peer dependency compatibility
+- [01-01]: Sync storage chosen for all settings (cross-device sync)
 
 ### Pending Todos
 
@@ -56,6 +61,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-19
-Stopped at: Phase 1 context gathered. Ready to run /gsd:plan-phase 1.
-Resume file: .planning/phases/01-foundation/01-CONTEXT.md
+Last session: 2026-02-20
+Stopped at: Completed 01-01-PLAN.md (project scaffold). Next: 01-02-PLAN.md (codec).
+Resume file: .planning/phases/01-foundation/01-02-PLAN.md

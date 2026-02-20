@@ -44,8 +44,8 @@
 
 ### Platform
 
-- [ ] **PLAT-01**: Extension uses Chrome Manifest V3
-- [ ] **PLAT-02**: All processing happens locally — no data leaves the browser
+- [x] **PLAT-01**: Extension uses Chrome Manifest V3
+- [x] **PLAT-02**: All processing happens locally — no data leaves the browser
 - [ ] **PLAT-03**: Extension is published on Chrome Web Store
 
 ## v2 Requirements
@@ -98,8 +98,8 @@
 | KEYS-03 | Phase 3 | Pending |
 | SETT-01 | Phase 3 | Pending |
 | SETT-02 | Phase 3 | Pending |
-| PLAT-01 | Phase 1 | Pending |
-| PLAT-02 | Phase 1 | Pending |
+| PLAT-01 | Phase 1 | Complete |
+| PLAT-02 | Phase 1 | Complete |
 | PLAT-03 | Phase 6 | Pending |
 
 **Coverage:**
