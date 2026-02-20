@@ -9,6 +9,10 @@ lerna-debug.log*
 
 node_modules
 .output
+.planning/
+DEPLOY.md
+blog-post.md
+*.zip
 stats.html
 stats-*.json
 .wxt
