@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 Phase: 6 of 6 (Chrome Web Store Submission)
 Plan: 1 of 2 in current phase (complete)
 Status: Executing Phase 6
-Last activity: 2026-02-20 — Completed Phase 6 Plan 1 (Store Submission Preparation)
+Last activity: 2026-02-20 - Completed quick task 1: Add dark mode, fix settings UI, remove broken Clear All, add per-class color selectors, show zero-width char codes
 
 Progress: [██████████] 95%
 
@@ -84,6 +84,12 @@ None yet.
 ### Blockers/Concerns
 
 - [Phase 5]: AI watermark detection character patterns are LOW confidence from research. Treat as a 1-2 hour empirical validation spike at Phase 5 start before building the named-label lookup table.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 1 | Add dark mode, fix settings UI, remove broken Clear All, add per-class color selectors, show zero-width char codes | 2026-02-20 | 07b7a25 | [1-add-dark-mode-fix-settings-ui-remove-bro](./quick/1-add-dark-mode-fix-settings-ui-remove-bro/) |
 
 ## Session Continuity
 
