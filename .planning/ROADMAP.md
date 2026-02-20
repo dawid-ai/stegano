@@ -44,7 +44,10 @@ Plans:
   3. Extension icon badge shows the correct count of hidden characters found after any scan completes
   4. User can toggle highlights off and back on without reloading the page — original page content is not destroyed
   5. Scanner does not noticeably degrade page load or interaction on a Wikipedia-length article (under 200ms TTI impact)
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 02-01-PLAN.md — Scanner pure functions (TDD) and messaging protocol
+- [ ] 02-02-PLAN.md — Background service worker + content script integration with inline highlighting
 
 ### Phase 3: Service Worker and Settings
 **Goal**: Keyboard shortcuts work reliably, settings persist across browser sessions, and the service worker survives termination without losing functionality
