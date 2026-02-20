@@ -13,7 +13,7 @@ Six phases take the extension from bare scaffolding to Chrome Web Store publicat
 - [x] **Phase 1: Foundation** - Core Unicode logic, WXT build setup, MV3 architecture decisions
 - [x] **Phase 2: Scanner** - Content script DOM scanner, inline highlighting, badge count
 - [x] **Phase 3: Service Worker and Settings** - Keyboard shortcuts, settings persistence, background logic
-- [ ] **Phase 4: Popup UI** - Converter interface, copy/clear, scan trigger in popup
+- [x] **Phase 4: Popup UI** - Converter interface, copy/clear, scan trigger in popup
 - [ ] **Phase 5: Differentiating Features** - Snippets library, AI watermark detection, configurable scan modes, export
 - [ ] **Phase 6: Chrome Web Store Submission** - Polish, permission justification, privacy policy, publish
 
@@ -76,7 +76,7 @@ Plans:
   5. User can clear both input fields with a single reset action
 **Plans:** 1 plan
 Plans:
-- [ ] 04-01-PLAN.md — Popup converter UI with encode/decode, clipboard copy, and clear
+- [x] 04-01-PLAN.md — Popup converter UI with encode/decode, clipboard copy, and clear
 
 ### Phase 5: Differentiating Features
 **Goal**: Users can save and paste named invisible Unicode snippets, the scanner detects AI watermark characters with named labels, and scan mode is configurable
@@ -111,6 +111,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6
 | 1. Foundation | 2/2 | Complete    | 2026-02-20 |
 | 2. Scanner | 2/2 | Complete | 2026-02-20 |
 | 3. Service Worker and Settings | 2/2 | Complete | 2026-02-20 |
-| 4. Popup UI | 0/1 | In progress | - |
+| 4. Popup UI | 1/1 | Complete | 2026-02-20 |
 | 5. Differentiating Features | 0/? | Not started | - |
 | 6. Chrome Web Store Submission | 0/? | Not started | - |

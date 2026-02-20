@@ -7,11 +7,11 @@
 
 ### Converter
 
-- [ ] **CONV-01**: User can type or paste text and get invisible Unicode encoded output (Tags block mapping)
-- [ ] **CONV-02**: User can paste invisible Unicode text and get decoded plaintext
-- [ ] **CONV-03**: User can copy encoded output to clipboard with visual confirmation
-- [ ] **CONV-04**: User can copy via manual button as fallback
-- [ ] **CONV-05**: User can clear/reset both input fields
+- [x] **CONV-01**: User can type or paste text and get invisible Unicode encoded output (Tags block mapping)
+- [x] **CONV-02**: User can paste invisible Unicode text and get decoded plaintext
+- [x] **CONV-03**: User can copy encoded output to clipboard with visual confirmation
+- [x] **CONV-04**: User can copy via manual button as fallback
+- [x] **CONV-05**: User can clear/reset both input fields
 
 ### Scanner
 
@@ -76,11 +76,11 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CONV-01 | Phase 4 | Pending |
-| CONV-02 | Phase 4 | Pending |
-| CONV-03 | Phase 4 | Pending |
-| CONV-04 | Phase 4 | Pending |
-| CONV-05 | Phase 4 | Pending |
+| CONV-01 | Phase 4 | Complete |
+| CONV-02 | Phase 4 | Complete |
+| CONV-03 | Phase 4 | Complete |
+| CONV-04 | Phase 4 | Complete |
+| CONV-05 | Phase 4 | Complete |
 | SCAN-01 | Phase 2 | Complete |
 | SCAN-02 | Phase 2 | Complete |
 | SCAN-03 | Phase 5 | Pending |
