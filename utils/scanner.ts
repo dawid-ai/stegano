@@ -8,7 +8,7 @@
  * @module scanner
  */
 
-import { buildDetectionRegex, type SensitivityLevel } from './charsets';
+import { buildDetectionRegex, AI_WATERMARK_CHARS, type SensitivityLevel } from './charsets';
 
 /** Tags block offset for mapping to/from ASCII */
 const TAGS_OFFSET = 0xe0000;
@@ -37,7 +37,7 @@ export interface ScanFinding {
   /** Human-readable replacement text */
   replacement: string;
   /** Character class */
-  type: 'tags' | 'zerowidth';
+  type: 'tags' | 'zerowidth' | 'watermark';
 }
 
 /**
@@ -67,6 +67,16 @@ export function decodeTagsRun(text: string): string {
  */
 function isTagsBlock(cp: number): boolean {
   return cp >= TAGS_BLOCK_START && cp <= TAGS_BLOCK_END;
+}
+
+/**
+ * Classify a codepoint into its character class.
+ * Priority: Tags block > watermark > zerowidth fallback.
+ */
+function classifyCodepoint(cp: number): 'tags' | 'watermark' | 'zerowidth' {
+  if (isTagsBlock(cp)) return 'tags';
+  if (AI_WATERMARK_CHARS.has(cp)) return 'watermark';
+  return 'zerowidth';
 }
 
 /**
@@ -148,14 +158,26 @@ export function findInvisibleChars(
 
       i = j;
     } else {
-      // Zero-width / other invisible character
-      const hex = current.cp.toString(16).toUpperCase().padStart(4, '0');
+      // Non-Tags character — classify as watermark or zerowidth
+      const charType = classifyCodepoint(current.cp);
+      let replacement: string;
+
+      if (charType === 'watermark') {
+        // Use named label from AI_WATERMARK_CHARS
+        const name = AI_WATERMARK_CHARS.get(current.cp)!;
+        replacement = `[${name}]`;
+      } else {
+        // Zerowidth fallback — hex code label
+        const hex = current.cp.toString(16).toUpperCase().padStart(4, '0');
+        replacement = `[U+${hex}]`;
+      }
+
       findings.push({
         start: current.start,
         end: current.end,
         original: current.original,
-        replacement: `[U+${hex}]`,
-        type: 'zerowidth',
+        replacement,
+        type: charType,
       });
       i++;
     }

@@ -292,3 +292,87 @@ describe('findInvisibleChars', () => {
     expect(findings[0].end).toBeLessThanOrEqual(findings[1].start);
   });
 });
+
+// ---------------------------------------------------------------------------
+// Watermark detection
+// ---------------------------------------------------------------------------
+
+describe('watermark detection', () => {
+  it('classifies U+202F (NNBSP) as watermark with named label', () => {
+    const text = 'hello\u202Fworld';
+    const findings = findInvisibleChars(text);
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0].type).toBe('watermark');
+    expect(findings[0].replacement).toBe('[Narrow No-Break Space]');
+    expect(findings[0].start).toBe(5);
+    expect(findings[0].end).toBe(6);
+  });
+
+  it('classifies U+2003 (Em Space) as watermark', () => {
+    const text = 'a\u2003b';
+    const findings = findInvisibleChars(text);
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0].type).toBe('watermark');
+    expect(findings[0].replacement).toBe('[Em Space]');
+  });
+
+  it('keeps U+200B classified as zerowidth (not watermark)', () => {
+    const text = 'a\u200Bb';
+    const findings = findInvisibleChars(text);
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0].type).toBe('zerowidth');
+    expect(findings[0].replacement).toBe('[U+200B]');
+  });
+
+  it('keeps Tags block characters classified as tags', () => {
+    const hidden = tagsEncode('test');
+    const findings = findInvisibleChars(hidden);
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0].type).toBe('tags');
+    expect(findings[0].replacement).toBe('test');
+  });
+
+  it('correctly classifies mixed text with all three classes', () => {
+    const tagsHidden = tagsEncode('msg');
+    // Tags + zerowidth + watermark
+    const text = tagsHidden + '\u200B' + '\u202F';
+    const findings = findInvisibleChars(text);
+
+    expect(findings).toHaveLength(3);
+
+    const tagsFinding = findings.find((f) => f.type === 'tags');
+    expect(tagsFinding).toBeDefined();
+    expect(tagsFinding!.replacement).toBe('msg');
+
+    const zwFinding = findings.find((f) => f.type === 'zerowidth');
+    expect(zwFinding).toBeDefined();
+    expect(zwFinding!.replacement).toBe('[U+200B]');
+
+    const wmFinding = findings.find((f) => f.type === 'watermark');
+    expect(wmFinding).toBeDefined();
+    expect(wmFinding!.replacement).toBe('[Narrow No-Break Space]');
+  });
+
+  it('uses named labels from AI_WATERMARK_CHARS (not hex codes)', () => {
+    // Test all 6 watermark characters have named labels
+    const watermarks = [
+      { char: '\u202F', label: '[Narrow No-Break Space]' },
+      { char: '\u2003', label: '[Em Space]' },
+      { char: '\u2002', label: '[En Space]' },
+      { char: '\u2009', label: '[Thin Space]' },
+      { char: '\u200A', label: '[Hair Space]' },
+      { char: '\u205F', label: '[Medium Mathematical Space]' },
+    ];
+
+    for (const { char, label } of watermarks) {
+      const findings = findInvisibleChars(`x${char}y`);
+      expect(findings).toHaveLength(1);
+      expect(findings[0].type).toBe('watermark');
+      expect(findings[0].replacement).toBe(label);
+    }
+  });
+});

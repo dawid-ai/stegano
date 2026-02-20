@@ -30,6 +30,31 @@ export interface SensitivityPreset {
 }
 
 // ---------------------------------------------------------------------------
+// AI watermark character map — conservative set (excludes U+00A0 due to
+// false positives from &nbsp;). Used for classification, not detection ranges.
+// ---------------------------------------------------------------------------
+
+export const AI_WATERMARK_CHARS: ReadonlyMap<number, string> = new Map([
+  [0x202f, 'Narrow No-Break Space'],
+  [0x2003, 'Em Space'],
+  [0x2002, 'En Space'],
+  [0x2009, 'Thin Space'],
+  [0x200a, 'Hair Space'],
+  [0x205f, 'Medium Mathematical Space'],
+]);
+
+// ---------------------------------------------------------------------------
+// Watermark ranges — included at Standard level for always-on detection
+// ---------------------------------------------------------------------------
+
+const WATERMARK_RANGES: CharRange[] = [
+  { start: 0x2002, end: 0x2003, name: 'En/Em Space (AI watermark)' },
+  { start: 0x2009, end: 0x200a, name: 'Thin/Hair Space (AI watermark)' },
+  { start: 0x202f, end: 0x202f, name: 'Narrow No-Break Space (AI watermark)' },
+  { start: 0x205f, end: 0x205f, name: 'Medium Mathematical Space (AI watermark)' },
+];
+
+// ---------------------------------------------------------------------------
 // Standard ranges — the most common hidden/invisible characters
 // ---------------------------------------------------------------------------
 
@@ -37,6 +62,7 @@ const STANDARD_RANGES: CharRange[] = [
   { start: 0xe0000, end: 0xe007f, name: 'Tags block' },
   { start: 0x200b, end: 0x200f, name: 'Zero-width & direction marks' },
   { start: 0xfeff, end: 0xfeff, name: 'BOM / Zero-width no-break space' },
+  ...WATERMARK_RANGES,
 ];
 
 // ---------------------------------------------------------------------------
