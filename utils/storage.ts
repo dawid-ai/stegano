@@ -9,8 +9,36 @@
  */
 
 import { storage } from 'wxt/utils/storage';
+import type { WxtStorageItem } from 'wxt/utils/storage';
 import type { SensitivityLevel } from './charsets';
 import type { ScanMode, Snippet } from './types';
+
+/** Structured result for storage write operations */
+export type StorageResult =
+  | { ok: true }
+  | { ok: false; reason: 'quota' | 'unknown'; message: string };
+
+/** Wrap a storage write in error handling that returns a structured result */
+async function safeStorageWrite<T>(
+  item: WxtStorageItem<T, Record<string, unknown>>,
+  value: T,
+): Promise<StorageResult> {
+  try {
+    await item.setValue(value);
+    return { ok: true };
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (msg.includes('QUOTA_BYTES')) {
+      return {
+        ok: false,
+        reason: 'quota',
+        message:
+          'Storage is full. Please delete some snippets to save new ones.',
+      };
+    }
+    return { ok: false, reason: 'unknown', message: 'Failed to save. Please try again.' };
+  }
+}
 
 /** Current sensitivity level for detection */
 export const sensitivitySetting = storage.defineItem<SensitivityLevel>(
@@ -53,24 +81,25 @@ export const snippetsSetting = storage.defineItem<Snippet[]>(
 );
 
 /** Add a new snippet to storage */
-export async function addSnippet(snippet: Snippet): Promise<void> {
+export async function addSnippet(snippet: Snippet): Promise<StorageResult> {
   const current = await snippetsSetting.getValue();
-  await snippetsSetting.setValue([...current, snippet]);
+  return safeStorageWrite(snippetsSetting, [...current, snippet]);
 }
 
 /** Update an existing snippet by ID */
 export async function updateSnippet(
   id: string,
   updates: Partial<Omit<Snippet, 'id'>>,
-): Promise<void> {
+): Promise<StorageResult> {
   const current = await snippetsSetting.getValue();
-  await snippetsSetting.setValue(
+  return safeStorageWrite(
+    snippetsSetting,
     current.map((s) => (s.id === id ? { ...s, ...updates } : s)),
   );
 }
 
 /** Delete a snippet by ID */
-export async function deleteSnippet(id: string): Promise<void> {
+export async function deleteSnippet(id: string): Promise<StorageResult> {
   const current = await snippetsSetting.getValue();
-  await snippetsSetting.setValue(current.filter((s) => s.id !== id));
+  return safeStorageWrite(snippetsSetting, current.filter((s) => s.id !== id));
 }

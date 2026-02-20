@@ -6,6 +6,7 @@ import {
   updateSnippet,
   deleteSnippet,
 } from '@/utils/storage';
+import type { StorageResult } from '@/utils/storage';
 
 /** Format a shortcut for display (e.g., "Alt+Shift+1") */
 function formatShortcut(shortcut?: SnippetShortcut): string {
@@ -70,6 +71,17 @@ export function App() {
   const [editForm, setEditForm] = useState<SnippetFormData>(emptyForm);
   const [createForm, setCreateForm] = useState<SnippetFormData>(emptyForm);
   const [quotaWarning, setQuotaWarning] = useState(false);
+  const [storageError, setStorageError] = useState<string | null>(null);
+
+  /** Check a storage result and set/clear the error banner */
+  function handleStorageResult(result: StorageResult): boolean {
+    if (!result.ok) {
+      setStorageError(result.message);
+      return false;
+    }
+    setStorageError(null);
+    return true;
+  }
 
   // Load snippets on mount and watch for changes
   useEffect(() => {
@@ -93,8 +105,10 @@ export function App() {
       content: createForm.content,
       shortcut: formToShortcut(createForm),
     };
-    await addSnippet(snippet);
-    setCreateForm(emptyForm);
+    const result = await addSnippet(snippet);
+    if (handleStorageResult(result)) {
+      setCreateForm(emptyForm);
+    }
   }
 
   function startEdit(snippet: Snippet) {
@@ -104,13 +118,15 @@ export function App() {
 
   async function handleSaveEdit() {
     if (!editingId || !editForm.name.trim() || !editForm.content) return;
-    await updateSnippet(editingId, {
+    const result = await updateSnippet(editingId, {
       name: editForm.name.trim(),
       content: editForm.content,
       shortcut: formToShortcut(editForm),
     });
-    setEditingId(null);
-    setEditForm(emptyForm);
+    if (handleStorageResult(result)) {
+      setEditingId(null);
+      setEditForm(emptyForm);
+    }
   }
 
   function cancelEdit() {
@@ -120,8 +136,10 @@ export function App() {
 
   async function handleDelete(id: string) {
     if (!confirm('Delete this snippet?')) return;
-    await deleteSnippet(id);
-    if (editingId === id) cancelEdit();
+    const result = await deleteSnippet(id);
+    if (handleStorageResult(result)) {
+      if (editingId === id) cancelEdit();
+    }
   }
 
   /** Count invisible characters (spread handles surrogate pairs) */
@@ -147,6 +165,21 @@ export function App() {
           <div class="mb-4 px-4 py-2 bg-yellow-50 border border-yellow-300 rounded-md text-xs text-yellow-800">
             Storage is getting full. Consider removing unused snippets to stay
             within the sync storage limit.
+          </div>
+        )}
+
+        {/* Storage Error Banner */}
+        {storageError && (
+          <div class="mb-4 px-4 py-2 bg-red-50 border border-red-300 rounded-md text-xs text-red-800 flex items-center justify-between">
+            <span>{storageError}</span>
+            <button
+              type="button"
+              onClick={() => setStorageError(null)}
+              class="ml-3 text-red-600 hover:text-red-800 font-bold text-sm leading-none"
+              aria-label="Dismiss error"
+            >
+              X
+            </button>
           </div>
         )}
 
