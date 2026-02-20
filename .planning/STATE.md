@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-19)
 
 **Core value:** Detect and reveal hidden Unicode text on any web page — protecting against prompt injection and hidden content attacks
-**Current focus:** Phase 3 — Service Worker and Settings
+**Current focus:** Phase 3 complete — next Phase 4 (Popup)
 
 ## Current Position
 
 Phase: 3 of 6 (Service Worker and Settings)
 Plan: 2 of 2 in current phase
-Status: Executing
-Last activity: 2026-02-20 — Completed 03-02 reactive highlight color update
+Status: Phase Complete
+Last activity: 2026-02-20 — Completed 03-01 keyboard shortcuts
 
-Progress: [████░░░░░░] 33%
+Progress: [████░░░░░░] 42%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
-- Average duration: 5 min
-- Total execution time: 0.30 hours
+- Total plans completed: 5
+- Average duration: 4 min
+- Total execution time: 0.33 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [████░░░░░░] 33%
 |-------|-------|-------|----------|
 | 01-foundation | 2 | 14 min | 7 min |
 | 02-scanner | 1 | 3 min | 3 min |
-| 03-service-worker-and-settings | 1 | 1 min | 1 min |
+| 03-service-worker-and-settings | 2 | 3 min | 1.5 min |
 
 **Recent Trend:**
-- Last 5 plans: 10min, 4min, 3min, 1min
+- Last 5 plans: 10min, 4min, 3min, 1min, 2min
 - Trend: accelerating
 
 *Updated after each plan completion*
@@ -59,6 +59,8 @@ Recent decisions affecting current work:
 - [02-01]: Adjacent Tags block matches merged in second pass after collecting all raw regex matches
 - [02-01]: Messaging ProtocolMap uses function syntax (not deprecated ProtocolWithReturn)
 - [03-02]: No scan mode watch needed in content script — SETT-02 already satisfied by sync storage persistence
+- [03-01]: Alt+Shift prefix for custom keyboard shortcuts to avoid browser shortcut conflicts
+- [03-01]: Clipboard write via scripting.executeScript func+args injection (simpler than messaging to content script)
 
 ### Pending Todos
 
@@ -71,5 +73,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 03-02-PLAN.md (reactive highlight color update)
-Resume file: .planning/phases/03-service-worker-and-settings/03-02-SUMMARY.md
+Stopped at: Completed 03-01-PLAN.md (keyboard shortcuts)
+Resume file: .planning/phases/03-service-worker-and-settings/03-01-SUMMARY.md

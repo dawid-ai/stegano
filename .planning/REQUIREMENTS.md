@@ -33,14 +33,14 @@
 
 ### Shortcuts
 
-- [ ] **KEYS-01**: User can open extension popup via configurable keyboard shortcut
-- [ ] **KEYS-02**: User can trigger page scan via configurable keyboard shortcut
-- [ ] **KEYS-03**: User can quick-paste primary snippet via configurable keyboard shortcut
+- [x] **KEYS-01**: User can open extension popup via configurable keyboard shortcut
+- [x] **KEYS-02**: User can trigger page scan via configurable keyboard shortcut
+- [x] **KEYS-03**: User can quick-paste primary snippet via configurable keyboard shortcut
 
 ### Settings
 
 - [x] **SETT-01**: User can configure highlight color/style for detected invisible characters
-- [ ] **SETT-02**: User can configure scan mode preference (persists across sessions)
+- [x] **SETT-02**: User can configure scan mode preference (persists across sessions)
 
 ### Platform
 
@@ -93,11 +93,11 @@
 | SNIP-01 | Phase 5 | Pending |
 | SNIP-02 | Phase 5 | Pending |
 | SNIP-03 | Phase 5 | Pending |
-| KEYS-01 | Phase 3 | Pending |
-| KEYS-02 | Phase 3 | Pending |
-| KEYS-03 | Phase 3 | Pending |
+| KEYS-01 | Phase 3 | Complete |
+| KEYS-02 | Phase 3 | Complete |
+| KEYS-03 | Phase 3 | Complete |
 | SETT-01 | Phase 3 | Complete |
-| SETT-02 | Phase 3 | Pending |
+| SETT-02 | Phase 3 | Complete |
 | PLAT-01 | Phase 1 | Complete |
 | PLAT-02 | Phase 1 | Complete |
 | PLAT-03 | Phase 6 | Pending |
