@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-19)
 ## Current Position
 
 Phase: 5 of 6 (Differentiating Features)
-Plan: 2 of 3 in current phase
-Status: Executing phase 5
-Last activity: 2026-02-20 — Completed Phase 5 Plan 1 (AI Watermark Detection)
+Plan: 3 of 3 in current phase (complete)
+Status: Phase 5 complete
+Last activity: 2026-02-20 — Completed Phase 5 Plan 3 (Snippet Shortcuts and Export JSON)
 
-Progress: [████████░░] 80%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
+- Total plans completed: 10
 - Average duration: 3 min
-- Total execution time: 0.48 hours
+- Total execution time: 0.51 hours
 
 **By Phase:**
 
@@ -31,10 +31,10 @@ Progress: [████████░░] 80%
 | 02-scanner | 1 | 3 min | 3 min |
 | 03-service-worker-and-settings | 2 | 3 min | 1.5 min |
 | 04-popup-ui | 1 | 2 min | 2 min |
-| 05-differentiating-features | 3 | 9 min | 3 min |
+| 05-differentiating-features | 3 | 11 min | 3.7 min |
 
 **Recent Trend:**
-- Last 5 plans: 1min, 2min, 2min, 3min, 3min
+- Last 5 plans: 2min, 2min, 3min, 3min, 2min
 - Trend: steady
 
 *Updated after each plan completion*
@@ -71,6 +71,8 @@ Recent decisions affecting current work:
 - [05-01]: Per-class colors: yellow=tags, orange=zerowidth, pink=watermark; custom color overrides all
 - [05-02]: Used sync storage for snippets (not local) per prior decision for cross-device sync
 - [05-02]: Alt+Shift pre-checked in shortcut configurator per prior keyboard shortcut convention
+- [05-03]: Clipboard copy as primary export method (file download has popup focus-loss problem)
+- [05-03]: getFindings returns null when no scan active (not empty array) for clear no-data signal
 
 ### Pending Todos
 
@@ -83,5 +85,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 05-01-PLAN.md (AI Watermark Detection)
-Resume file: .planning/phases/05-differentiating-features/05-01-SUMMARY.md
+Stopped at: Completed 05-03-PLAN.md (Snippet Shortcuts and Export JSON) — Phase 5 complete
+Resume file: .planning/phases/05-differentiating-features/05-03-SUMMARY.md

@@ -23,12 +23,12 @@
 - [x] **SCAN-06**: Scanner discriminates between Tags block, zero-width, and AI watermark character classes
 - [x] **SCAN-07**: User can configure scan mode: always-on, on-demand, or badge-only
 - [ ] **SCAN-08**: User can toggle highlights on/off without page reload (non-destructive)
-- [ ] **SCAN-09**: User can export scan results as JSON report (clipboard or download)
+- [x] **SCAN-09**: User can export scan results as JSON report (clipboard or download)
 
 ### Snippets
 
 - [x] **SNIP-01**: User can save named invisible Unicode snippets in extension settings
-- [ ] **SNIP-02**: User can paste a saved snippet via its assigned keyboard shortcut
+- [x] **SNIP-02**: User can paste a saved snippet via its assigned keyboard shortcut
 - [x] **SNIP-03**: User can edit and delete saved snippets
 
 ### Shortcuts
@@ -89,9 +89,9 @@
 | SCAN-06 | Phase 5 | Complete |
 | SCAN-07 | Phase 2 | Complete |
 | SCAN-08 | Phase 2 | Pending |
-| SCAN-09 | Phase 5 | Pending |
+| SCAN-09 | Phase 5 | Complete |
 | SNIP-01 | Phase 5 | Complete |
-| SNIP-02 | Phase 5 | Pending |
+| SNIP-02 | Phase 5 | Complete |
 | SNIP-03 | Phase 5 | Complete |
 | KEYS-01 | Phase 3 | Complete |
 | KEYS-02 | Phase 3 | Complete |
