@@ -46,7 +46,7 @@
 
 - [x] **PLAT-01**: Extension uses Chrome Manifest V3
 - [x] **PLAT-02**: All processing happens locally — no data leaves the browser
-- [ ] **PLAT-03**: Extension is published on Chrome Web Store
+- [x] **PLAT-03**: Extension is published on Chrome Web Store
 
 ## v2 Requirements
 
@@ -100,7 +100,7 @@
 | SETT-02 | Phase 3 | Complete |
 | PLAT-01 | Phase 1 | Complete |
 | PLAT-02 | Phase 1 | Complete |
-| PLAT-03 | Phase 6 | Pending |
+| PLAT-03 | Phase 6 | Complete |
 
 **Coverage:**
 - v1 requirements: 25 total
