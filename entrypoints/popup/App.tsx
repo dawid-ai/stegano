@@ -73,12 +73,41 @@ export function App() {
   }
 
   const handleScanPage = useCallback(async () => {
-    await sendMessage('triggerScan', undefined);
+    const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+    if (!tab?.id) return;
+
+    // Inject content script if not already present
+    try {
+      await sendMessage('ping', undefined, tab.id);
+    } catch {
+      await browser.scripting.executeScript({
+        target: { tabId: tab.id },
+        files: ['/content-scripts/content.js'],
+      });
+    }
+
+    // Start scan — fire and close popup immediately
+    sendMessage('startScan', undefined, tab.id)
+      .then((result) => {
+        // Update badge from popup context
+        if (result.count > 0) {
+          const text = result.count > 999 ? '999+' : result.count.toString();
+          void browser.action.setBadgeText({ text, tabId: tab.id! });
+          void browser.action.setBadgeBackgroundColor({ color: '#F44336', tabId: tab.id! });
+        } else {
+          void browser.action.setBadgeText({ text: '\u2713', tabId: tab.id! });
+          void browser.action.setBadgeBackgroundColor({ color: '#4CAF50', tabId: tab.id! });
+          setTimeout(() => {
+            void browser.action.setBadgeText({ text: '', tabId: tab.id! });
+          }, 1500);
+        }
+      })
+      .catch(() => {});
     window.close();
   }, []);
 
   const handleOpenSettings = useCallback(() => {
-    browser.runtime.openOptionsPage();
+    void browser.tabs.create({ url: browser.runtime.getURL('settings.html') });
     window.close();
   }, []);
 
