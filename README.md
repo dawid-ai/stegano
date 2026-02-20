@@ -30,7 +30,7 @@ Screenshots coming soon.
 **Prerequisites:** Node.js 18+, pnpm
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/dawid-ai/stegano.git
 cd stegano
 pnpm install
 ```
