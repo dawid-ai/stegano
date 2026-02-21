@@ -289,14 +289,22 @@ export function App() {
       </section>
 
       {/* Footer */}
-      <div class="text-center pt-1">
+      <div class="flex flex-col items-center gap-0.5 pt-1">
         <a
           href="https://dawid.ai/stegano"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-[10px] text-gray-400 dark:text-gray-500 hover:text-blue-500 transition-colors"
+          class="text-xs font-medium text-gray-500 dark:text-gray-400 hover:text-blue-500 transition-colors"
         >
           dawid.ai/stegano
+        </a>
+        <a
+          href="https://dawid-ai.github.io/stegano/demo.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-[10px] text-gray-400 dark:text-gray-500 hover:text-blue-500 transition-colors"
+        >
+          Demo Page
         </a>
       </div>
     </div>
