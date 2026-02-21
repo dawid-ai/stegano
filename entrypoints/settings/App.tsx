@@ -11,6 +11,7 @@
 import { useState, useEffect } from 'preact/hooks';
 import type { Snippet, SnippetShortcut, ScanMode } from '@/utils/types';
 import type { SensitivityLevel } from '@/utils/charsets';
+import { encode, decode } from '@/utils/codec';
 import {
   snippetsSetting,
   addSnippet,
@@ -76,7 +77,7 @@ function formToShortcut(form: SnippetFormData): SnippetShortcut | undefined {
 function snippetToForm(snippet: Snippet): SnippetFormData {
   return {
     name: snippet.name,
-    content: snippet.content,
+    content: decode(snippet.content),
     shortcutAlt: snippet.shortcut?.alt ?? true,
     shortcutShift: snippet.shortcut?.shift ?? true,
     shortcutCtrl: snippet.shortcut?.ctrl ?? false,
@@ -147,10 +148,17 @@ export function App() {
   /** Create a new snippet from the create form and save to storage. */
   async function handleCreate() {
     if (!createForm.name.trim() || !createForm.content) return;
+    let encoded: string;
+    try {
+      encoded = encode(createForm.content);
+    } catch {
+      setStorageError('Failed to encode text. Only printable ASCII characters (space through ~) are supported.');
+      return;
+    }
     const snippet: Snippet = {
       id: crypto.randomUUID(),
       name: createForm.name.trim(),
-      content: createForm.content,
+      content: encoded,
       shortcut: formToShortcut(createForm),
     };
     const result = await addSnippet(snippet);
@@ -167,9 +175,16 @@ export function App() {
   /** Save changes to the currently edited snippet. */
   async function handleSaveEdit() {
     if (!editingId || !editForm.name.trim() || !editForm.content) return;
+    let encoded: string;
+    try {
+      encoded = encode(editForm.content);
+    } catch {
+      setStorageError('Failed to encode text. Only printable ASCII characters (space through ~) are supported.');
+      return;
+    }
     const result = await updateSnippet(editingId, {
       name: editForm.name.trim(),
-      content: editForm.content,
+      content: encoded,
       shortcut: formToShortcut(editForm),
     });
     if (handleStorageResult(result)) {
@@ -190,11 +205,6 @@ export function App() {
     if (handleStorageResult(result)) {
       if (editingId === id) cancelEdit();
     }
-  }
-
-  /** Count invisible characters (spread handles surrogate pairs) */
-  function invisibleCharCount(content: string): number {
-    return [...content].length;
   }
 
   return (
@@ -432,14 +442,9 @@ export function App() {
                   content: (e.target as HTMLTextAreaElement).value,
                 })
               }
-              placeholder="Paste invisible Unicode content here..."
-              class="w-full h-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm text-transparent bg-white dark:bg-gray-800"
+              placeholder="Type the text you want to hide (will be encoded on save)..."
+              class="w-full h-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
             />
-            {createForm.content && (
-              <p class="text-xs text-gray-500 dark:text-gray-400">
-                {invisibleCharCount(createForm.content)} invisible characters
-              </p>
-            )}
 
             {/* Shortcut configurator */}
             <div class="flex items-center gap-3 flex-wrap">
@@ -549,15 +554,9 @@ export function App() {
                             content: (e.target as HTMLTextAreaElement).value,
                           })
                         }
-                        placeholder="Paste invisible Unicode content here..."
-                        class="w-full h-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm text-transparent bg-white dark:bg-gray-800"
+                        placeholder="Type the text you want to hide (will be encoded on save)..."
+                        class="w-full h-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                       />
-                      {editForm.content && (
-                        <p class="text-xs text-gray-500 dark:text-gray-400">
-                          {invisibleCharCount(editForm.content)} invisible
-                          characters
-                        </p>
-                      )}
 
                       {/* Shortcut configurator */}
                       <div class="flex items-center gap-3 flex-wrap">
@@ -650,8 +649,8 @@ export function App() {
                       <p class="font-medium text-gray-800 dark:text-gray-100 truncate">
                         {snippet.name}
                       </p>
-                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                        [{invisibleCharCount(snippet.content)} invisible chars]
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
+                        {decode(snippet.content) || `[${[...snippet.content].length} invisible chars]`}
                       </p>
                       <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
                         {formatShortcut(snippet.shortcut)}

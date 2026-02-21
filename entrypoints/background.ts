@@ -11,7 +11,7 @@
 
 import { browser } from 'wxt/browser';
 import { onMessage, sendMessage } from '@/utils/messaging';
-import { primarySnippetSetting, scanModeSetting } from '@/utils/storage';
+import { snippetsSetting, scanModeSetting } from '@/utils/storage';
 
 /** URLs where content script injection is not allowed */
 const RESTRICTED_PREFIXES = ['chrome://', 'about:', 'chrome-extension://'];
@@ -92,18 +92,18 @@ async function handleScanToggle(tabId: number, url: string | undefined): Promise
 }
 
 /**
- * Copy the primary snippet to the clipboard via content script injection.
- * Fails silently on restricted pages or when no snippet is set.
+ * Copy the first saved snippet to the clipboard via content script injection.
+ * Fails silently on restricted pages or when no snippets exist.
  */
 async function handleQuickPaste(tabId: number): Promise<void> {
-  const snippet = await primarySnippetSetting.getValue();
-  if (!snippet) return;
+  const snippets = await snippetsSetting.getValue();
+  if (!snippets.length) return;
 
   try {
     await browser.scripting.executeScript({
       target: { tabId },
       func: (text: string) => navigator.clipboard.writeText(text),
-      args: [snippet],
+      args: [snippets[0].content],
     });
   } catch {
     // Clipboard write may fail on restricted pages or if page doesn't have focus
