@@ -25,6 +25,7 @@ import {
   scanModeSetting,
   sensitivitySetting,
   autoCopyOnEncodeSetting,
+  snippetPasteModeSetting,
 } from '@/utils/storage';
 import type { StorageResult } from '@/utils/storage';
 
@@ -59,6 +60,7 @@ export function App() {
   const [scanMode, setScanMode] = useState<ScanMode>('onDemand');
   const [sensitivity, setSensitivity] = useState<SensitivityLevel>('standard');
   const [autoCopy, setAutoCopy] = useState(false);
+  const [snippetPasteMode, setSnippetPasteMode] = useState<'paste' | 'copy'>('paste');
 
   /** Check a storage result and set/clear the error banner */
   function handleStorageResult(result: StorageResult): boolean {
@@ -83,6 +85,7 @@ export function App() {
     scanModeSetting.getValue().then(setScanMode);
     sensitivitySetting.getValue().then(setSensitivity);
     autoCopyOnEncodeSetting.getValue().then(setAutoCopy);
+    snippetPasteModeSetting.getValue().then(setSnippetPasteMode);
 
     const unwatchSnippets = snippetsSetting.watch((newVal) => {
       if (newVal) {
@@ -243,6 +246,26 @@ export function App() {
             <p class="text-[11px] text-gray-400 dark:text-gray-500 -mt-2">
               When enabled, clicking Encode in the popup will automatically copy the invisible text to your clipboard.
             </p>
+
+            {/* Context Menu Snippet Behavior */}
+            <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Context Menu Snippet Behavior</label>
+              <select
+                value={snippetPasteMode}
+                onChange={(e) => {
+                  const val = (e.target as HTMLSelectElement).value as 'paste' | 'copy';
+                  setSnippetPasteMode(val);
+                  void snippetPasteModeSetting.setValue(val);
+                }}
+                class="w-full max-w-xs px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+              >
+                <option value="paste">Paste at cursor -- inserts snippet text directly where your cursor is</option>
+                <option value="copy">Copy to clipboard -- copies snippet for manual pasting</option>
+              </select>
+              <p class="text-[11px] text-gray-400 dark:text-gray-500">
+                Right-click on any page to access your saved snippets from the context menu.
+              </p>
+            </div>
 
             {/* Scan Mode */}
             <div class="flex flex-col gap-1.5">

@@ -246,6 +246,42 @@ export default defineContentScript({
     // Health check — verify content script is injected and responsive
     onMessage('ping', () => 'pong' as const);
 
+    // Handle snippet insertion from context menu
+    onMessage('insertSnippet', async ({ content, mode }) => {
+      if (mode === 'copy') {
+        try {
+          await navigator.clipboard.writeText(content);
+          return true;
+        } catch {
+          return false;
+        }
+      }
+
+      // mode === 'paste': insert at cursor in editable element
+      const el = document.activeElement;
+      if (
+        el instanceof HTMLInputElement ||
+        el instanceof HTMLTextAreaElement
+      ) {
+        // Use execCommand to respect cursor position and undo stack
+        document.execCommand('insertText', false, content);
+        return true;
+      }
+
+      if (el instanceof HTMLElement && el.isContentEditable) {
+        document.execCommand('insertText', false, content);
+        return true;
+      }
+
+      // No active editable element — fall back to clipboard copy
+      try {
+        await navigator.clipboard.writeText(content);
+        return true;
+      } catch {
+        return false;
+      }
+    });
+
     // Trigger a full DOM scan
     onMessage('startScan', async () => {
       return performFullScan();

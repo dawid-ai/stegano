@@ -7,11 +7,12 @@
  * - Content script injection on first click
  * - Badge management (finding count, checkmark, clear on navigation)
  * - Restricted URL filtering (chrome://, about:, etc.)
+ * - Context menu for snippet pasting
  */
 
 import { browser } from 'wxt/browser';
 import { onMessage, sendMessage } from '@/utils/messaging';
-import { scanModeSetting } from '@/utils/storage';
+import { scanModeSetting, snippetsSetting, snippetPasteModeSetting } from '@/utils/storage';
 
 /** URLs where content script injection is not allowed */
 const RESTRICTED_PREFIXES = ['chrome://', 'about:', 'chrome-extension://'];
@@ -91,6 +92,31 @@ async function handleScanToggle(tabId: number, url: string | undefined): Promise
   }
 }
 
+/**
+ * Build (or rebuild) the context menu for snippet pasting.
+ * Called on install and whenever snippets change in storage.
+ */
+async function buildSnippetMenus(): Promise<void> {
+  await browser.contextMenus.removeAll();
+  const snippets = await snippetsSetting.getValue();
+  if (snippets.length === 0) return;
+
+  browser.contextMenus.create({
+    id: 'stegano-snippets',
+    title: 'Stegano - Paste Snippet',
+    contexts: ['all'],
+  });
+
+  for (const snippet of snippets) {
+    browser.contextMenus.create({
+      id: `stegano-snippet-${snippet.id}`,
+      parentId: 'stegano-snippets',
+      title: snippet.name,
+      contexts: ['all'],
+    });
+  }
+}
+
 export default defineBackground(() => {
   /**
    * Handle extension icon click -- toggle scan on/off.
@@ -127,10 +153,54 @@ export default defineBackground(() => {
     }
   });
 
-  // Log scan mode on install to confirm storage is accessible from service worker
+  // Build context menus and confirm storage on install
   browser.runtime.onInstalled.addListener(async () => {
     const mode = await scanModeSetting.getValue();
     void mode; // Confirm storage is accessible from service worker on install
+    await buildSnippetMenus();
+  });
+
+  // Rebuild context menus when snippets change
+  snippetsSetting.watch(() => {
+    void buildSnippetMenus();
+  });
+
+  // Handle context menu clicks for snippet paste/copy
+  browser.contextMenus.onClicked.addListener(async (info, tab) => {
+    const menuId = String(info.menuItemId);
+    if (!menuId.startsWith('stegano-snippet-')) return;
+
+    const snippetId = menuId.replace('stegano-snippet-', '');
+    const snippets = await snippetsSetting.getValue();
+    const snippet = snippets.find((s) => s.id === snippetId);
+    if (!snippet || !tab?.id) return;
+
+    const mode = await snippetPasteModeSetting.getValue();
+
+    // Try sending to content script
+    try {
+      await sendMessage('insertSnippet', { content: snippet.content, mode }, tab.id);
+    } catch {
+      // Content script not loaded — inject and retry
+      try {
+        await browser.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ['/content-scripts/content.js'],
+        });
+        await sendMessage('insertSnippet', { content: snippet.content, mode }, tab.id);
+      } catch {
+        // Fallback: copy to clipboard via scripting API (restricted page)
+        try {
+          await browser.scripting.executeScript({
+            target: { tabId: tab.id },
+            func: (text: string) => navigator.clipboard.writeText(text),
+            args: [snippet.content],
+          });
+        } catch {
+          // Restricted page — fail silently
+        }
+      }
+    }
   });
 
   // Clear badge when tab navigates to a new page

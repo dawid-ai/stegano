@@ -88,6 +88,12 @@ export const primarySnippetSetting = storage.defineItem<string>(
   { fallback: '' },
 );
 
+/** Context menu snippet behavior: 'paste' inserts at cursor, 'copy' copies to clipboard */
+export const snippetPasteModeSetting = storage.defineItem<'paste' | 'copy'>(
+  'sync:snippetPasteMode',
+  { fallback: 'paste' },
+);
+
 /** Saved invisible Unicode snippets for quick-paste */
 export const snippetsSetting = storage.defineItem<Snippet[]>(
   'sync:snippets',
