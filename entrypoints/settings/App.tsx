@@ -23,6 +23,7 @@ import {
   watermarkColorSetting,
   scanModeSetting,
   sensitivitySetting,
+  autoCopyOnEncodeSetting,
 } from '@/utils/storage';
 import type { StorageResult } from '@/utils/storage';
 
@@ -98,6 +99,7 @@ export function App() {
   const [watermarkColor, setWatermarkColor] = useState('#E91E63');
   const [scanMode, setScanMode] = useState<ScanMode>('onDemand');
   const [sensitivity, setSensitivity] = useState<SensitivityLevel>('standard');
+  const [autoCopy, setAutoCopy] = useState(false);
 
   /** Check a storage result and set/clear the error banner */
   function handleStorageResult(result: StorageResult): boolean {
@@ -121,6 +123,7 @@ export function App() {
     watermarkColorSetting.getValue().then(setWatermarkColor);
     scanModeSetting.getValue().then(setScanMode);
     sensitivitySetting.getValue().then(setSensitivity);
+    autoCopyOnEncodeSetting.getValue().then(setAutoCopy);
 
     const unwatchSnippets = snippetsSetting.watch((newVal) => {
       if (newVal) {
@@ -263,6 +266,26 @@ export function App() {
                 <option value="light">Light</option>
               </select>
             </div>
+
+            {/* Auto-copy on Encode */}
+            <div class="flex items-center gap-3">
+              <label class="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={autoCopy}
+                  onChange={(e) => {
+                    const val = (e.target as HTMLInputElement).checked;
+                    setAutoCopy(val);
+                    void autoCopyOnEncodeSetting.setValue(val);
+                  }}
+                  class="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-400"
+                />
+                Auto-copy encoded text to clipboard
+              </label>
+            </div>
+            <p class="text-[11px] text-gray-400 dark:text-gray-500 -mt-2">
+              When enabled, clicking Encode in the popup will automatically copy the invisible text to your clipboard.
+            </p>
 
             {/* Scan Mode */}
             <div class="flex flex-col gap-1.5">
