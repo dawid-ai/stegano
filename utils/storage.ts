@@ -70,6 +70,12 @@ export const watermarkColorSetting = storage.defineItem<string>(
   { fallback: '#E91E63' },
 );
 
+/** Whether to automatically copy encoded text to clipboard after encoding */
+export const autoCopyOnEncodeSetting = storage.defineItem<boolean>(
+  'sync:autoCopyOnEncode',
+  { fallback: false },
+);
+
 /** Scan mode: on-demand (user clicks scan) or auto (scan on page load) */
 export const scanModeSetting = storage.defineItem<ScanMode>(
   'sync:scanMode',

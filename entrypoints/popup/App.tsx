@@ -14,7 +14,7 @@ import { encode, decode } from '@/utils/codec';
 import { copyToClipboard } from '@/utils/clipboard';
 import { sendMessage } from '@/utils/messaging';
 import { buildScanReport } from '@/utils/export';
-import { themeSetting } from '@/utils/storage';
+import { themeSetting, autoCopyOnEncodeSetting } from '@/utils/storage';
 
 export function App() {
   const [encodeInput, setEncodeInput] = useState('');
@@ -25,6 +25,7 @@ export function App() {
   const [copied, setCopied] = useState<'idle' | 'success' | 'fail'>('idle');
   const [exportStatus, setExportStatus] = useState<'idle' | 'success' | 'empty' | 'fail'>('idle');
   const [scanActive, setScanActive] = useState(false);
+  const [autoCopy, setAutoCopy] = useState(false);
   const copyTimer = useRef<number>(0);
   const exportTimer = useRef<number>(0);
 
@@ -33,6 +34,7 @@ export function App() {
     themeSetting.getValue().then((theme) => {
       document.documentElement.classList.toggle('dark', theme === 'dark');
     });
+    autoCopyOnEncodeSetting.getValue().then(setAutoCopy);
     const unwatch = themeSetting.watch((theme) => {
       document.documentElement.classList.toggle('dark', theme === 'dark');
     });
@@ -73,11 +75,17 @@ export function App() {
   }
 
   /** Encode the input text into invisible Tags block Unicode. */
-  function handleEncode() {
+  async function handleEncode() {
     try {
       const result = encode(encodeInput);
       setEncodeOutput(result);
       setError('');
+      if (autoCopy) {
+        clearTimeout(copyTimer.current);
+        const ok = await copyToClipboard(result);
+        setCopied(ok ? 'success' : 'fail');
+        copyTimer.current = window.setTimeout(() => setCopied('idle'), 2000);
+      }
     } catch (e) {
       setEncodeOutput('');
       setError(e instanceof Error ? e.message : 'Encoding failed');
