@@ -13,8 +13,7 @@
 
 import { onMessage } from '@/utils/messaging';
 import { findInvisibleChars, type ScanFinding } from '@/utils/scanner';
-import { tagsColorSetting, zerowColorSetting, watermarkColorSetting, sensitivitySetting, scanModeSetting, snippetsSetting } from '@/utils/storage';
-import type { Snippet } from '@/utils/types';
+import { tagsColorSetting, zerowColorSetting, watermarkColorSetting, sensitivitySetting, scanModeSetting } from '@/utils/storage';
 
 /** Tags to skip when walking the DOM */
 const SKIP_TAGS = new Set([
@@ -244,43 +243,8 @@ async function performFullScan(): Promise<{ count: number }> {
 export default defineContentScript({
   matches: ['<all_urls>'],
   main() {
-    // --- Snippet keyboard shortcuts ---
-    let snippets: Snippet[] = [];
-    snippetsSetting.getValue().then((s) => { snippets = s; }).catch(() => {});
-    try { snippetsSetting.watch((s) => { snippets = s; }); } catch { /* restricted page */ }
-
-    document.addEventListener('keydown', (e: KeyboardEvent) => {
-      if (!e.altKey || !e.shiftKey) return; // Alt+Shift prefix required
-
-      const match = snippets.find((s) =>
-        s.shortcut &&
-        s.shortcut.key.toLowerCase() === e.key.toLowerCase() &&
-        s.shortcut.alt === e.altKey &&
-        s.shortcut.shift === e.shiftKey &&
-        !!s.shortcut.ctrl === e.ctrlKey,
-      );
-
-      if (match) {
-        e.preventDefault();
-        e.stopPropagation();
-        navigator.clipboard.writeText(match.content).catch(() => {
-          // Clipboard write may fail if page doesn't have focus
-        });
-      }
-    }, true); // useCapture to intercept before page handlers
-
     // Health check — verify content script is injected and responsive
     onMessage('ping', () => 'pong' as const);
-
-    // Copy text to clipboard (used by background quick-paste shortcut)
-    onMessage('copyToClipboard', async (text) => {
-      try {
-        await navigator.clipboard.writeText(text);
-        return true;
-      } catch {
-        return false;
-      }
-    });
 
     // Trigger a full DOM scan
     onMessage('startScan', async () => {

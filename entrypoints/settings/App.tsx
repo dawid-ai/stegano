@@ -3,13 +3,14 @@
  *
  * Provides controls for theme selection, scan mode, detection sensitivity,
  * per-class highlight colors, keyboard shortcut reference, and a full
- * snippet library manager (create, edit, delete, with keyboard shortcuts).
+ * snippet library manager (create, edit, delete) with context menu integration.
  *
  * @module settings/App
  */
 
 import { useState, useEffect } from 'preact/hooks';
-import type { Snippet, SnippetShortcut, ScanMode } from '@/utils/types';
+import { browser } from 'wxt/browser';
+import type { Snippet, ScanMode } from '@/utils/types';
 import type { SensitivityLevel } from '@/utils/charsets';
 import { encode, decode } from '@/utils/codec';
 import {
@@ -27,17 +28,6 @@ import {
 } from '@/utils/storage';
 import type { StorageResult } from '@/utils/storage';
 
-/** Format a shortcut for display (e.g., "Alt+Shift+1") */
-function formatShortcut(shortcut?: SnippetShortcut): string {
-  if (!shortcut?.key) return 'No shortcut';
-  const parts: string[] = [];
-  if (shortcut.ctrl) parts.push('Ctrl');
-  if (shortcut.alt) parts.push('Alt');
-  if (shortcut.shift) parts.push('Shift');
-  parts.push(shortcut.key.toUpperCase());
-  return parts.join('+');
-}
-
 /** Estimate storage size of snippets array in bytes */
 function estimateSize(snippets: Snippet[]): number {
   return JSON.stringify(snippets).length;
@@ -48,43 +38,12 @@ const QUOTA_WARNING_BYTES = 6 * 1024; // 6KB warning threshold
 interface SnippetFormData {
   name: string;
   content: string;
-  shortcutAlt: boolean;
-  shortcutShift: boolean;
-  shortcutCtrl: boolean;
-  shortcutKey: string;
 }
 
 const emptyForm: SnippetFormData = {
   name: '',
   content: '',
-  shortcutAlt: true,
-  shortcutShift: true,
-  shortcutCtrl: false,
-  shortcutKey: '',
 };
-
-/** Convert form data to a SnippetShortcut, or undefined if no key is set. */
-function formToShortcut(form: SnippetFormData): SnippetShortcut | undefined {
-  if (!form.shortcutKey) return undefined;
-  return {
-    alt: form.shortcutAlt,
-    shift: form.shortcutShift,
-    ctrl: form.shortcutCtrl,
-    key: form.shortcutKey,
-  };
-}
-
-/** Convert a saved Snippet into editable form data. */
-function snippetToForm(snippet: Snippet): SnippetFormData {
-  return {
-    name: snippet.name,
-    content: decode(snippet.content),
-    shortcutAlt: snippet.shortcut?.alt ?? true,
-    shortcutShift: snippet.shortcut?.shift ?? true,
-    shortcutCtrl: snippet.shortcut?.ctrl ?? false,
-    shortcutKey: snippet.shortcut?.key ?? '',
-  };
-}
 
 export function App() {
   const [snippets, setSnippets] = useState<Snippet[]>([]);
@@ -162,7 +121,6 @@ export function App() {
       id: crypto.randomUUID(),
       name: createForm.name.trim(),
       content: encoded,
-      shortcut: formToShortcut(createForm),
     };
     const result = await addSnippet(snippet);
     if (handleStorageResult(result)) {
@@ -172,7 +130,7 @@ export function App() {
 
   function startEdit(snippet: Snippet) {
     setEditingId(snippet.id);
-    setEditForm(snippetToForm(snippet));
+    setEditForm({ name: snippet.name, content: decode(snippet.content) });
   }
 
   /** Save changes to the currently edited snippet. */
@@ -188,7 +146,6 @@ export function App() {
     const result = await updateSnippet(editingId, {
       name: editForm.name.trim(),
       content: encoded,
-      shortcut: formToShortcut(editForm),
     });
     if (handleStorageResult(result)) {
       setEditingId(null);
@@ -427,13 +384,19 @@ export function App() {
                   <span>Toggle scan</span>
                   <kbd class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-[11px]">Alt+Shift+S</kbd>
                 </div>
-                <div class="flex justify-between max-w-xs">
-                  <span>Quick paste</span>
-                  <kbd class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-[11px]">Alt+Shift+V</kbd>
-                </div>
               </div>
               <p class="text-[11px] text-gray-400 dark:text-gray-500">
-                Customize these in <code>chrome://extensions/shortcuts</code>
+                Customize these in{' '}
+                <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    void browser.tabs.create({ url: 'chrome://extensions/shortcuts' });
+                  }}
+                  class="text-blue-600 hover:text-blue-800 underline"
+                >
+                  chrome://extensions/shortcuts
+                </a>
               </p>
             </div>
           </div>
@@ -468,63 +431,6 @@ export function App() {
               placeholder="Type the text you want to hide (will be encoded on save)..."
               class="w-full h-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
             />
-
-            {/* Shortcut configurator */}
-            <div class="flex items-center gap-3 flex-wrap">
-              <span class="text-xs text-gray-600 dark:text-gray-400">Shortcut:</span>
-              <label class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300">
-                <input
-                  type="checkbox"
-                  checked={createForm.shortcutAlt}
-                  onChange={(e) =>
-                    setCreateForm({
-                      ...createForm,
-                      shortcutAlt: (e.target as HTMLInputElement).checked,
-                    })
-                  }
-                />
-                Alt
-              </label>
-              <label class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300">
-                <input
-                  type="checkbox"
-                  checked={createForm.shortcutShift}
-                  onChange={(e) =>
-                    setCreateForm({
-                      ...createForm,
-                      shortcutShift: (e.target as HTMLInputElement).checked,
-                    })
-                  }
-                />
-                Shift
-              </label>
-              <label class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300">
-                <input
-                  type="checkbox"
-                  checked={createForm.shortcutCtrl}
-                  onChange={(e) =>
-                    setCreateForm({
-                      ...createForm,
-                      shortcutCtrl: (e.target as HTMLInputElement).checked,
-                    })
-                  }
-                />
-                Ctrl
-              </label>
-              <input
-                type="text"
-                maxLength={1}
-                value={createForm.shortcutKey}
-                onInput={(e) =>
-                  setCreateForm({
-                    ...createForm,
-                    shortcutKey: (e.target as HTMLInputElement).value,
-                  })
-                }
-                placeholder="Key"
-                class="w-12 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-xs text-center focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
-              />
-            </div>
 
             <button
               type="button"
@@ -581,66 +487,6 @@ export function App() {
                         class="w-full h-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
                       />
 
-                      {/* Shortcut configurator */}
-                      <div class="flex items-center gap-3 flex-wrap">
-                        <span class="text-xs text-gray-600 dark:text-gray-400">Shortcut:</span>
-                        <label class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300">
-                          <input
-                            type="checkbox"
-                            checked={editForm.shortcutAlt}
-                            onChange={(e) =>
-                              setEditForm({
-                                ...editForm,
-                                shortcutAlt: (e.target as HTMLInputElement)
-                                  .checked,
-                              })
-                            }
-                          />
-                          Alt
-                        </label>
-                        <label class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300">
-                          <input
-                            type="checkbox"
-                            checked={editForm.shortcutShift}
-                            onChange={(e) =>
-                              setEditForm({
-                                ...editForm,
-                                shortcutShift: (e.target as HTMLInputElement)
-                                  .checked,
-                              })
-                            }
-                          />
-                          Shift
-                        </label>
-                        <label class="flex items-center gap-1 text-xs text-gray-700 dark:text-gray-300">
-                          <input
-                            type="checkbox"
-                            checked={editForm.shortcutCtrl}
-                            onChange={(e) =>
-                              setEditForm({
-                                ...editForm,
-                                shortcutCtrl: (e.target as HTMLInputElement)
-                                  .checked,
-                              })
-                            }
-                          />
-                          Ctrl
-                        </label>
-                        <input
-                          type="text"
-                          maxLength={1}
-                          value={editForm.shortcutKey}
-                          onInput={(e) =>
-                            setEditForm({
-                              ...editForm,
-                              shortcutKey: (e.target as HTMLInputElement).value,
-                            })
-                          }
-                          placeholder="Key"
-                          class="w-12 px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-xs text-center focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
-                        />
-                      </div>
-
                       <div class="flex gap-2">
                         <button
                           type="button"
@@ -674,9 +520,6 @@ export function App() {
                       </p>
                       <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
                         {decode(snippet.content) || `[${[...snippet.content].length} invisible chars]`}
-                      </p>
-                      <p class="text-xs text-gray-400 dark:text-gray-500 mt-0.5">
-                        {formatShortcut(snippet.shortcut)}
                       </p>
                     </div>
                     <div class="flex gap-2 shrink-0">

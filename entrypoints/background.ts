@@ -3,7 +3,7 @@
  *
  * Handles:
  * - browser.action.onClicked toggle (scan on / scan off)
- * - browser.commands.onCommand for keyboard shortcuts (trigger-scan, quick-paste)
+ * - browser.commands.onCommand for keyboard shortcuts (trigger-scan)
  * - Content script injection on first click
  * - Badge management (finding count, checkmark, clear on navigation)
  * - Restricted URL filtering (chrome://, about:, etc.)
@@ -11,7 +11,7 @@
 
 import { browser } from 'wxt/browser';
 import { onMessage, sendMessage } from '@/utils/messaging';
-import { snippetsSetting, scanModeSetting } from '@/utils/storage';
+import { scanModeSetting } from '@/utils/storage';
 
 /** URLs where content script injection is not allowed */
 const RESTRICTED_PREFIXES = ['chrome://', 'about:', 'chrome-extension://'];
@@ -91,32 +91,6 @@ async function handleScanToggle(tabId: number, url: string | undefined): Promise
   }
 }
 
-/**
- * Copy the first saved snippet to the clipboard via content script message.
- * Falls back to scripting.executeScript if content script isn't responding.
- * Fails silently on restricted pages or when no snippets exist.
- */
-async function handleQuickPaste(tabId: number): Promise<void> {
-  const snippets = await snippetsSetting.getValue();
-  if (!snippets.length) return;
-
-  try {
-    // Try messaging the content script first (works without host permission)
-    await sendMessage('copyToClipboard', snippets[0].content, tabId);
-  } catch {
-    // Content script not loaded — try injecting
-    try {
-      await browser.scripting.executeScript({
-        target: { tabId },
-        func: (text: string) => navigator.clipboard.writeText(text),
-        args: [snippets[0].content],
-      });
-    } catch {
-      // Restricted page or no permission — fail silently
-    }
-  }
-}
-
 export default defineBackground(() => {
   /**
    * Handle extension icon click -- toggle scan on/off.
@@ -149,9 +123,6 @@ export default defineBackground(() => {
     switch (command) {
       case 'trigger-scan':
         await handleScanToggle(activeTab.id, activeTab.url);
-        break;
-      case 'quick-paste':
-        await handleQuickPaste(activeTab.id);
         break;
     }
   });

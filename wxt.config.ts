@@ -28,7 +28,7 @@ export default defineConfig({
     description: 'AI Red Team tool — hide and detect invisible Unicode on any web page. Test prompt injection, find ASCII smuggling, reveal hidden text.',
     homepage_url: 'https://dawid.ai/stegano',
     action: {},
-    permissions: ['storage', 'activeTab', 'scripting'],
+    permissions: ['storage', 'activeTab', 'scripting', 'contextMenus'],
     optional_host_permissions: ['<all_urls>'],
     commands: {
       _execute_action: {
@@ -37,10 +37,6 @@ export default defineConfig({
       'trigger-scan': {
         suggested_key: { default: 'Alt+Shift+S', mac: 'Command+Shift+S' },
         description: 'Scan page for invisible characters',
-      },
-      'quick-paste': {
-        suggested_key: { default: 'Alt+Shift+V', mac: 'Command+Shift+V' },
-        description: 'Paste primary invisible text snippet',
       },
     },
     options_ui: {
