@@ -246,8 +246,8 @@ export default defineContentScript({
   main() {
     // --- Snippet keyboard shortcuts ---
     let snippets: Snippet[] = [];
-    snippetsSetting.getValue().then((s) => { snippets = s; });
-    snippetsSetting.watch((s) => { snippets = s; });
+    snippetsSetting.getValue().then((s) => { snippets = s; }).catch(() => {});
+    try { snippetsSetting.watch((s) => { snippets = s; }); } catch { /* restricted page */ }
 
     document.addEventListener('keydown', (e: KeyboardEvent) => {
       if (!e.altKey || !e.shiftKey) return; // Alt+Shift prefix required
@@ -309,22 +309,24 @@ export default defineContentScript({
       if (mode === 'auto') {
         performFullScan().catch(() => {});
       }
-    });
+    }).catch(() => { /* restricted page — no storage access */ });
 
     // Reactively update highlight colors per class when settings change
-    tagsColorSetting.watch((newColor) => {
-      document.querySelectorAll<HTMLElement>('[data-iu-highlight][data-iu-type="tags"]')
-        .forEach(el => { el.style.backgroundColor = newColor; });
-    });
+    try {
+      tagsColorSetting.watch((newColor) => {
+        document.querySelectorAll<HTMLElement>('[data-iu-highlight][data-iu-type="tags"]')
+          .forEach(el => { el.style.backgroundColor = newColor; });
+      });
 
-    zerowColorSetting.watch((newColor) => {
-      document.querySelectorAll<HTMLElement>('[data-iu-highlight][data-iu-type="zerowidth"]')
-        .forEach(el => { el.style.backgroundColor = newColor; });
-    });
+      zerowColorSetting.watch((newColor) => {
+        document.querySelectorAll<HTMLElement>('[data-iu-highlight][data-iu-type="zerowidth"]')
+          .forEach(el => { el.style.backgroundColor = newColor; });
+      });
 
-    watermarkColorSetting.watch((newColor) => {
-      document.querySelectorAll<HTMLElement>('[data-iu-highlight][data-iu-type="watermark"]')
-        .forEach(el => { el.style.backgroundColor = newColor; });
-    });
+      watermarkColorSetting.watch((newColor) => {
+        document.querySelectorAll<HTMLElement>('[data-iu-highlight][data-iu-type="watermark"]')
+          .forEach(el => { el.style.backgroundColor = newColor; });
+      });
+    } catch { /* restricted page — no storage access */ }
   },
 });
