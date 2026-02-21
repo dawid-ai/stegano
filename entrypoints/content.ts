@@ -272,6 +272,16 @@ export default defineContentScript({
     // Health check — verify content script is injected and responsive
     onMessage('ping', () => 'pong' as const);
 
+    // Copy text to clipboard (used by background quick-paste shortcut)
+    onMessage('copyToClipboard', async (text) => {
+      try {
+        await navigator.clipboard.writeText(text);
+        return true;
+      } catch {
+        return false;
+      }
+    });
+
     // Trigger a full DOM scan
     onMessage('startScan', async () => {
       return performFullScan();

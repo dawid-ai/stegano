@@ -38,6 +38,7 @@ type MessageMap = {
   clearScan: { data: undefined; response: void };
   getFindings: { data: undefined; response: FindingsResponse | null };
   triggerScan: { data: undefined; response: void };
+  copyToClipboard: { data: string; response: boolean };
 };
 
 type MessageType = keyof MessageMap;

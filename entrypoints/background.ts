@@ -92,7 +92,8 @@ async function handleScanToggle(tabId: number, url: string | undefined): Promise
 }
 
 /**
- * Copy the first saved snippet to the clipboard via content script injection.
+ * Copy the first saved snippet to the clipboard via content script message.
+ * Falls back to scripting.executeScript if content script isn't responding.
  * Fails silently on restricted pages or when no snippets exist.
  */
 async function handleQuickPaste(tabId: number): Promise<void> {
@@ -100,13 +101,19 @@ async function handleQuickPaste(tabId: number): Promise<void> {
   if (!snippets.length) return;
 
   try {
-    await browser.scripting.executeScript({
-      target: { tabId },
-      func: (text: string) => navigator.clipboard.writeText(text),
-      args: [snippets[0].content],
-    });
+    // Try messaging the content script first (works without host permission)
+    await sendMessage('copyToClipboard', snippets[0].content, tabId);
   } catch {
-    // Clipboard write may fail on restricted pages or if page doesn't have focus
+    // Content script not loaded — try injecting
+    try {
+      await browser.scripting.executeScript({
+        target: { tabId },
+        func: (text: string) => navigator.clipboard.writeText(text),
+        args: [snippets[0].content],
+      });
+    } catch {
+      // Restricted page or no permission — fail silently
+    }
   }
 }
 
@@ -132,15 +139,19 @@ export default defineBackground(() => {
   });
 
   // Handle keyboard shortcut commands
+  // Note: `tab` param may be undefined in MV3; fall back to querying active tab
   browser.commands.onCommand.addListener(async (command, tab) => {
-    if (!tab?.id) return;
+    const activeTab = tab?.id
+      ? tab
+      : (await browser.tabs.query({ active: true, currentWindow: true }))[0];
+    if (!activeTab?.id) return;
 
     switch (command) {
       case 'trigger-scan':
-        await handleScanToggle(tab.id, tab.url);
+        await handleScanToggle(activeTab.id, activeTab.url);
         break;
       case 'quick-paste':
-        await handleQuickPaste(tab.id);
+        await handleQuickPaste(activeTab.id);
         break;
     }
   });
