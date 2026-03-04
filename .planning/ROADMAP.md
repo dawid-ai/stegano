@@ -141,7 +141,10 @@ Plans:
   3. Given encrypted invisible Unicode and the wrong password, decryption fails with a clear error message ("Decryption failed -- wrong password or corrupted data") rather than producing garbage output
   4. Compression automatically activates when it reduces message size, producing fewer invisible characters than uncompressed encryption (verifiable by comparing character counts for messages over 30 characters)
   5. The wire format `[version:1][salt:16][iv:12][ciphertext+tag:N+12]` is locked and documented, with the `ENC1:` marker prefix inside the Tags block encoding distinguishing encrypted from plain hidden text
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 07-01-PLAN.md — Compression and markers modules (TDD)
+- [ ] 07-02-PLAN.md — Core crypto module with AES-256-GCM and full pipeline integration (TDD)
 
 #### Phase 8: Popup Encrypt/Decrypt UI
 **Goal**: Users can encrypt and decrypt text with passwords directly in the popup, with clear feedback on character count impact
@@ -202,7 +205,7 @@ Note: Phases 9 and 10 can be parallelized (Phase 9 depends on Phase 7 only; Phas
 | 4. Popup UI | v1.0 | 1/1 | Complete | 2026-02-20 |
 | 5. Differentiating Features | v1.0 | 3/3 | Complete | 2026-02-21 |
 | 6. Chrome Web Store Submission | v1.0 | 2/2 | Complete | 2026-02-21 |
-| 7. Core Encryption Pipeline | v1.1 | 0/? | Not started | - |
+| 7. Core Encryption Pipeline | v1.1 | 0/2 | In progress | - |
 | 8. Popup Encrypt/Decrypt UI | v1.1 | 0/? | Not started | - |
 | 9. Scanner Integration | v1.1 | 0/? | Not started | - |
 | 10. Password Management | v1.1 | 0/? | Not started | - |
