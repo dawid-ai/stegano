@@ -10,6 +10,7 @@ lerna-debug.log*
 node_modules
 .output
 .planning/
+.claude/
 DEPLOY.md
 blog-post.md
 *.zip
