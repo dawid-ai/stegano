@@ -53,12 +53,12 @@
 
 ### Encryption Core
 
-- [ ] **ENCR-01**: User can encrypt plaintext with a password before encoding to invisible Unicode (AES-256-GCM via Web Crypto API)
-- [ ] **ENCR-02**: User can decrypt encrypted invisible text by entering the correct password
-- [ ] **ENCR-03**: Encrypted output includes invisible markers (`ENC1:` prefix inside Tags block) distinguishing it from plain hidden text
-- [ ] **ENCR-04**: Wrong password displays clear error message ("Decryption failed — wrong password or corrupted data")
-- [ ] **ENCR-05**: Messages are compressed before encryption via CompressionStream API when compression reduces size
-- [ ] **ENCR-06**: Encryption uses PBKDF2 key derivation with random salt (210,000 iterations)
+- [x] **ENCR-01**: User can encrypt plaintext with a password before encoding to invisible Unicode (AES-256-GCM via Web Crypto API)
+- [x] **ENCR-02**: User can decrypt encrypted invisible text by entering the correct password
+- [x] **ENCR-03**: Encrypted output includes invisible markers (`ENC1:` prefix inside Tags block) distinguishing it from plain hidden text
+- [x] **ENCR-04**: Wrong password displays clear error message ("Decryption failed — wrong password or corrupted data")
+- [x] **ENCR-05**: Messages are compressed before encryption via CompressionStream API when compression reduces size
+- [x] **ENCR-06**: Encryption uses PBKDF2 key derivation with random salt (210,000 iterations)
 
 ### Encryption UX
 
@@ -153,12 +153,12 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ENCR-01 | Phase 7 | Pending |
-| ENCR-02 | Phase 7 | Pending |
-| ENCR-03 | Phase 7 | Pending |
-| ENCR-04 | Phase 7 | Pending |
-| ENCR-05 | Phase 7 | Pending |
-| ENCR-06 | Phase 7 | Pending |
+| ENCR-01 | Phase 7 | Complete |
+| ENCR-02 | Phase 7 | Complete |
+| ENCR-03 | Phase 7 | Complete |
+| ENCR-04 | Phase 7 | Complete |
+| ENCR-05 | Phase 7 | Complete |
+| ENCR-06 | Phase 7 | Complete |
 | EUXP-01 | Phase 8 | Pending |
 | EUXP-02 | Phase 8 | Pending |
 | EUXP-03 | Phase 8 | Pending |
