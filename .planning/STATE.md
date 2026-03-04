@@ -4,15 +4,17 @@
 
 See: .planning/PROJECT.md (updated 2026-03-04)
 
-**Core value:** Detect and reveal hidden Unicode text on any web page — protecting against prompt injection and hidden content attacks
-**Current focus:** Milestone v1.1 — Encrypted Hidden Text
+**Core value:** Detect and reveal hidden Unicode text on any web page -- protecting against prompt injection and hidden content attacks
+**Current focus:** Phase 7 — Core Encryption Pipeline (v1.1 Encrypted Hidden Text)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-03-04 — Milestone v1.1 started
+Phase: 7 of 11 (Core Encryption Pipeline)
+Plan: 0 of ? in current phase
+Status: Ready to plan
+Last activity: 2026-03-04 -- v1.1 roadmap created (Phases 7-11)
+
+Progress: [██████████░░░░░░░░░░] 55% (v1.0 complete, v1.1 starting)
 
 ## Performance Metrics
 
@@ -45,35 +47,12 @@ Last activity: 2026-03-04 — Milestone v1.1 started
 Decisions are logged in PROJECT.md Key Decisions table.
 Recent decisions affecting current work:
 
-- [Roadmap]: Permission model locked as activeTab for on-demand; all_urls as optional runtime permission for auto-scan — cannot be retrofitted, must be Phase 1 decision
-- [Roadmap]: Stack decided — WXT 0.20.17, Preact, TypeScript, Tailwind CSS 4.x, @webext-core/messaging and @webext-core/storage
-- [Roadmap]: AI watermark character patterns (Phase 5) require empirical validation before implementation — single LOW-confidence source, validate as Phase 5 spike
-- [01-01]: Used optional_host_permissions (not optional_permissions) for all_urls in MV3 manifest
-- [01-01]: Used wxt/utils/storage import path (not wxt/storage) for WXT 0.20.17 API
-- [01-01]: Used hoisted node-linker (.npmrc) to work around pnpm Windows symlink bug
-- [01-01]: ESLint 9 pinned for wxt peer dependency compatibility
-- [01-01]: Sync storage chosen for all settings (cross-device sync)
-- [01-02]: Tags block full range (U+E0000-E007F) used for encoding, not just printable ASCII subset
-- [01-02]: BOM at position 0 skipped silently; BOM elsewhere stripped per active preset
-- [01-02]: Wrapper chars (U+E0001, U+E007F) stripped as part of Tags block range handling in decode
-- [02-01]: Used regex.exec() loop (not for...of) for UTF-16 offset compatibility with Text.splitText()
-- [02-01]: Adjacent Tags block matches merged in second pass after collecting all raw regex matches
-- [02-01]: Messaging ProtocolMap uses function syntax (not deprecated ProtocolWithReturn)
-- [03-02]: No scan mode watch needed in content script — SETT-02 already satisfied by sync storage persistence
-- [03-01]: Alt+Shift prefix for custom keyboard shortcuts to avoid browser shortcut conflicts
-- [03-01]: Clipboard write via scripting.executeScript func+args injection (simpler than messaging to content script)
-- [04-01]: Encode is button-triggered (can throw), decode is live on input (never throws)
-- [04-01]: Encoded output textarea uses text-transparent since Tags block chars are invisible
-- [04-01]: Single Clear All button in header rather than per-section clear buttons
-- [05-01]: Conservative watermark set excludes U+00A0 (too many false positives from nbsp)
-- [05-01]: Watermark findings use named labels (e.g., [Narrow No-Break Space]) not hex codes
-- [05-01]: Per-class colors: yellow=tags, orange=zerowidth, pink=watermark; custom color overrides all
-- [05-02]: Used sync storage for snippets (not local) per prior decision for cross-device sync
-- [05-02]: Alt+Shift pre-checked in shortcut configurator per prior keyboard shortcut convention (removed in quick-4)
-- [05-03]: Clipboard copy as primary export method (file download has popup focus-loss problem)
-- [05-03]: getFindings returns null when no scan active (not empty array) for clear no-data signal
-- [06-01]: StorageResult discriminated union with ok/reason/message for structured storage error handling
-- [06-01]: Error banner renders below quota warning with dismiss button
+- [v1.1 Roadmap]: Wire format locked as `[version:1][salt:16][iv:12][ciphertext+tag:N+12]` Base64-encoded with `ENC1:` marker prefix
+- [v1.1 Roadmap]: Encrypt-then-encode flow (plaintext -> compress -> encrypt -> Base64 -> marker -> Tags encode)
+- [v1.1 Roadmap]: AES-256-GCM via Web Crypto API, PBKDF2-SHA-256 key derivation (210,000 iterations)
+- [v1.1 Roadmap]: Zero new dependencies -- Web Crypto API and CompressionStream are browser built-ins
+- [v1.1 Roadmap]: Passwords stored in chrome.storage.local (not synced), distinct from snippet sync storage
+- [v1.1 Roadmap]: Encrypted content detection off by default (manual trigger)
 
 ### Pending Todos
 
@@ -81,7 +60,9 @@ None yet.
 
 ### Blockers/Concerns
 
-- [Phase 5]: AI watermark detection character patterns are LOW confidence from research. Treat as a 1-2 hour empirical validation spike at Phase 5 start before building the named-label lookup table.
+- [Research]: CompressionStream may not be available in Vitest test environment -- may need browser-mode testing or test polyfill
+- [Research]: Password storage tension -- PITFALLS.md recommends session-only, ARCHITECTURE.md recommends local. Product decision needed before Phase 10.
+- [Research]: PBKDF2 at 210,000 iterations needs benchmarking on target hardware -- adjust if >500ms
 
 ### Quick Tasks Completed
 
@@ -95,5 +76,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-04
-Stopped at: Starting milestone v1.1 — Encrypted Hidden Text
-Resume file: —
+Stopped at: v1.1 roadmap created -- ready to plan Phase 7
+Resume file: --

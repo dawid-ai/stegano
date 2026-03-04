@@ -153,34 +153,34 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ENCR-01 | — | Pending |
-| ENCR-02 | — | Pending |
-| ENCR-03 | — | Pending |
-| ENCR-04 | — | Pending |
-| ENCR-05 | — | Pending |
-| ENCR-06 | — | Pending |
-| EUXP-01 | — | Pending |
-| EUXP-02 | — | Pending |
-| EUXP-03 | — | Pending |
-| EUXP-04 | — | Pending |
-| EUXP-05 | — | Pending |
-| EDET-01 | — | Pending |
-| EDET-02 | — | Pending |
-| EDET-03 | — | Pending |
-| EDET-04 | — | Pending |
-| EDET-05 | — | Pending |
-| PASS-01 | — | Pending |
-| PASS-02 | — | Pending |
-| PASS-03 | — | Pending |
-| PASS-04 | — | Pending |
-| PASS-05 | — | Pending |
+| ENCR-01 | Phase 7 | Pending |
+| ENCR-02 | Phase 7 | Pending |
+| ENCR-03 | Phase 7 | Pending |
+| ENCR-04 | Phase 7 | Pending |
+| ENCR-05 | Phase 7 | Pending |
+| ENCR-06 | Phase 7 | Pending |
+| EUXP-01 | Phase 8 | Pending |
+| EUXP-02 | Phase 8 | Pending |
+| EUXP-03 | Phase 8 | Pending |
+| EUXP-04 | Phase 8 | Pending |
+| EUXP-05 | Phase 8 | Pending |
+| EDET-01 | Phase 9 | Pending |
+| EDET-02 | Phase 9 | Pending |
+| EDET-03 | Phase 11 | Pending |
+| EDET-04 | Phase 11 | Pending |
+| EDET-05 | Phase 9 | Pending |
+| PASS-01 | Phase 10 | Pending |
+| PASS-02 | Phase 10 | Pending |
+| PASS-03 | Phase 10 | Pending |
+| PASS-04 | Phase 10 | Pending |
+| PASS-05 | Phase 10 | Pending |
 
 **Coverage:**
 - v1.0 requirements: 25 total (23 complete, 2 pending)
 - v1.1 requirements: 21 total
-- Mapped to phases: 0 (awaiting roadmap)
-- Unmapped: 21
+- Mapped to phases: 21/21
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-19*
-*Last updated: 2026-03-04 after v1.1 milestone requirements definition*
+*Last updated: 2026-03-04 after v1.1 roadmap creation*
