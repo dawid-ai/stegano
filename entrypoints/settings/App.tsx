@@ -22,6 +22,8 @@ import {
   tagsColorSetting,
   zerowColorSetting,
   watermarkColorSetting,
+  encryptedColorSetting,
+  detectEncryptedSetting,
   scanModeSetting,
   sensitivitySetting,
   autoCopyOnEncodeSetting,
@@ -60,6 +62,8 @@ export function App() {
   const [scanMode, setScanMode] = useState<ScanMode>('onDemand');
   const [sensitivity, setSensitivity] = useState<SensitivityLevel>('standard');
   const [autoCopy, setAutoCopy] = useState(false);
+  const [encryptedColor, setEncryptedColor] = useState('#00BCD4');
+  const [detectEncrypted, setDetectEncrypted] = useState(false);
   const [snippetPasteMode, setSnippetPasteMode] = useState<'paste' | 'copy'>('paste');
 
   /** Check a storage result and set/clear the error banner */
@@ -85,6 +89,8 @@ export function App() {
     scanModeSetting.getValue().then(setScanMode);
     sensitivitySetting.getValue().then(setSensitivity);
     autoCopyOnEncodeSetting.getValue().then(setAutoCopy);
+    encryptedColorSetting.getValue().then(setEncryptedColor);
+    detectEncryptedSetting.getValue().then(setDetectEncrypted);
     snippetPasteModeSetting.getValue().then(setSnippetPasteMode);
 
     const unwatchSnippets = snippetsSetting.watch((newVal) => {
@@ -247,6 +253,26 @@ export function App() {
               When enabled, clicking Encode in the popup will automatically copy the invisible text to your clipboard.
             </p>
 
+            {/* Auto-detect Encrypted Content */}
+            <div class="flex items-center gap-3">
+              <label class="flex items-center gap-2 text-xs text-gray-700 dark:text-gray-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={detectEncrypted}
+                  onChange={(e) => {
+                    const val = (e.target as HTMLInputElement).checked;
+                    setDetectEncrypted(val);
+                    void detectEncryptedSetting.setValue(val);
+                  }}
+                  class="w-4 h-4 rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-400"
+                />
+                Auto-detect encrypted hidden text during scans
+              </label>
+            </div>
+            <p class="text-[11px] text-gray-400 dark:text-gray-500 -mt-2">
+              When enabled, the scanner will identify encrypted content (ENC1: marker) and highlight it with a distinct color and [Encrypted] label.
+            </p>
+
             {/* Context Menu Snippet Behavior */}
             <div class="flex flex-col gap-1.5">
               <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Context Menu Snippet Behavior</label>
@@ -390,8 +416,35 @@ export function App() {
                 </div>
               </div>
 
+              {/* Encrypted Color */}
+              <div class="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={encryptedColor}
+                  onInput={(e) => {
+                    const val = (e.target as HTMLInputElement).value;
+                    setEncryptedColor(val);
+                    void encryptedColorSetting.setValue(val);
+                  }}
+                  class="w-10 h-10 border border-gray-300 dark:border-gray-600 rounded cursor-pointer"
+                />
+                <div class="flex flex-col">
+                  <span class="text-xs text-gray-600 dark:text-gray-400">Encrypted Color: {encryptedColor}</span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setEncryptedColor('#00BCD4');
+                      void encryptedColorSetting.setValue('#00BCD4');
+                    }}
+                    class="text-[11px] text-blue-600 hover:text-blue-800 text-left"
+                  >
+                    Reset to default
+                  </button>
+                </div>
+              </div>
+
               <p class="text-[11px] text-gray-400 dark:text-gray-500">
-                Customize highlight colors per character class: yellow for Tags block, orange for zero-width, pink for AI watermarks.
+                Customize highlight colors per character class: yellow for Tags block, orange for zero-width, pink for AI watermarks, cyan for encrypted.
               </p>
             </div>
 
