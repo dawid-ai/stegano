@@ -11,7 +11,7 @@
 import { storage } from 'wxt/utils/storage';
 import type { WxtStorageItem } from 'wxt/utils/storage';
 import type { SensitivityLevel } from './charsets';
-import type { ScanMode, Snippet } from './types';
+import type { ScanMode, Snippet, SavedPassword } from './types';
 
 /** Structured result for storage write operations */
 export type StorageResult =
@@ -134,4 +134,52 @@ export async function updateSnippet(
 export async function deleteSnippet(id: string): Promise<StorageResult> {
   const current = await snippetsSetting.getValue();
   return safeStorageWrite(snippetsSetting, current.filter((s) => s.id !== id));
+}
+
+// ---------------------------------------------------------------------------
+// Password management (device-local storage)
+// ---------------------------------------------------------------------------
+
+/** Saved passwords for encrypting snippets — stored locally, NOT synced */
+export const passwordsSetting = storage.defineItem<SavedPassword[]>(
+  'local:passwords',
+  { fallback: [] },
+);
+
+/** Add a new saved password to storage */
+export async function addPassword(pw: SavedPassword): Promise<StorageResult> {
+  const current = await passwordsSetting.getValue();
+  return safeStorageWrite(passwordsSetting, [...current, pw]);
+}
+
+/** Update an existing saved password by ID */
+export async function updatePassword(
+  id: string,
+  updates: Partial<Omit<SavedPassword, 'id'>>,
+): Promise<StorageResult> {
+  const current = await passwordsSetting.getValue();
+  return safeStorageWrite(
+    passwordsSetting,
+    current.map((p) => (p.id === id ? { ...p, ...updates } : p)),
+  );
+}
+
+/** Delete a saved password by ID and cascade-unlink from any snippets referencing it */
+export async function deletePassword(id: string): Promise<StorageResult> {
+  const current = await passwordsSetting.getValue();
+  const result = safeStorageWrite(passwordsSetting, current.filter((p) => p.id !== id));
+  if (!(await result).ok) return result;
+
+  // Cascade: clear passwordId on any snippets linked to this password
+  const snippets = await snippetsSetting.getValue();
+  const linked = snippets.filter((s) => s.passwordId === id);
+  if (linked.length > 0) {
+    const updated = snippets.map((s) =>
+      s.passwordId === id ? { ...s, passwordId: undefined } : s,
+    );
+    const cascadeResult = await safeStorageWrite(snippetsSetting, updated);
+    if (!cascadeResult.ok) return cascadeResult;
+  }
+
+  return { ok: true };
 }

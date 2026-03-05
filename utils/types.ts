@@ -16,5 +16,17 @@ export interface Snippet {
   name: string;
   /** The invisible Unicode content (already encoded) */
   content: string;
+  /** Optional link to a SavedPassword for encrypted paste */
+  passwordId?: string;
+}
+
+/** A saved password for encrypting snippet content */
+export interface SavedPassword {
+  /** Unique identifier (crypto.randomUUID) */
+  id: string;
+  /** User-assigned name for this password */
+  name: string;
+  /** The password value */
+  password: string;
 }
 
