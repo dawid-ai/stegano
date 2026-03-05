@@ -101,6 +101,20 @@ describe('encrypt/decrypt', () => {
     expect(a).not.toBe(b);
   });
 
+  it('compress option: encrypt with { compress: false } round-trips correctly', async () => {
+    const encrypted = await encrypt('hello world', 'pw', { compress: false });
+    const decrypted = await decrypt(encrypted, 'pw');
+    expect(decrypted).toBe('hello world');
+  });
+
+  it('compress option: { compress: false } produces longer payload than default for compressible text', async () => {
+    const longText = 'a'.repeat(500);
+    const withCompression = await encrypt(longText, 'pw');
+    const withoutCompression = await encrypt(longText, 'pw', { compress: false });
+    // Without compression should be longer (more Base64 chars)
+    expect(withoutCompression.length).toBeGreaterThan(withCompression.length);
+  });
+
   it('compression: encrypting 200 chars of "abc" repeated sets compression flag', async () => {
     const input = 'abc'.repeat(67).slice(0, 200);
     const result = await encrypt(input, 'pw');

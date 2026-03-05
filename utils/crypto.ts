@@ -110,12 +110,22 @@ function base64ToUint8(b64: string): Uint8Array {
  */
 export async function encrypt(
   plaintext: string,
-  password: string
+  password: string,
+  options?: { compress?: boolean }
 ): Promise<string> {
   const plaintextBytes = new TextEncoder().encode(plaintext);
 
-  // Optionally compress
-  const { data: payloadBytes, compressed } = await maybeCompress(plaintextBytes);
+  // Optionally compress (skip when explicitly disabled)
+  let payloadBytes: Uint8Array;
+  let compressed: boolean;
+  if (options?.compress === false) {
+    payloadBytes = plaintextBytes;
+    compressed = false;
+  } else {
+    const result = await maybeCompress(plaintextBytes);
+    payloadBytes = result.data;
+    compressed = result.compressed;
+  }
 
   // Generate random salt and IV
   const salt = crypto.getRandomValues(new Uint8Array(SALT_LENGTH));
@@ -216,9 +226,10 @@ export async function decrypt(
  */
 export async function encryptToInvisible(
   plaintext: string,
-  password: string
+  password: string,
+  options?: { compress?: boolean }
 ): Promise<string> {
-  const base64 = await encrypt(plaintext, password);
+  const base64 = await encrypt(plaintext, password, options);
   const marked = wrapEncrypted(base64);
   return encode(marked);
 }
