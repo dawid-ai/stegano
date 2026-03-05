@@ -13,7 +13,7 @@
 
 import { onMessage } from '@/utils/messaging';
 import { findInvisibleChars, type ScanFinding } from '@/utils/scanner';
-import { tagsColorSetting, zerowColorSetting, watermarkColorSetting, sensitivitySetting, scanModeSetting } from '@/utils/storage';
+import { tagsColorSetting, zerowColorSetting, watermarkColorSetting, encryptedColorSetting, detectEncryptedSetting, sensitivitySetting, scanModeSetting } from '@/utils/storage';
 
 /** Tags to skip when walking the DOM */
 const SKIP_TAGS = new Set([
@@ -29,6 +29,7 @@ const CLASS_COLORS: Record<string, string> = {
   tags: '#FFEB3B',      // Yellow — Tags block encoded messages
   zerowidth: '#FF9800', // Orange — Zero-width invisible chars
   watermark: '#E91E63', // Pink/Magenta — AI watermark indicators
+  encrypted: '#00BCD4', // Cyan — Encrypted hidden text
 };
 
 /** Per-class color settings from user preferences */
@@ -36,6 +37,7 @@ interface ClassColors {
   tags: string;
   zerowidth: string;
   watermark: string;
+  encrypted: string;
 }
 
 /** Module-level state */
@@ -124,11 +126,11 @@ function clearAllHighlights(): void {
  * Scan a single text node and apply highlights if findings exist.
  * Returns the findings array for accumulation in allFindings.
  */
-function scanTextNode(textNode: Text, classColors: ClassColors, sensitivity: import('@/utils/charsets').SensitivityLevel = 'standard'): ScanFinding[] {
+function scanTextNode(textNode: Text, classColors: ClassColors, sensitivity: import('@/utils/charsets').SensitivityLevel = 'standard', detectEncrypted: boolean = false): ScanFinding[] {
   const text = textNode.textContent;
   if (!text) return [];
 
-  const findings = findInvisibleChars(text, sensitivity);
+  const findings = findInvisibleChars(text, sensitivity, { detectEncrypted });
   if (findings.length === 0) return [];
 
   highlightFindings(textNode, findings, classColors);
@@ -138,7 +140,7 @@ function scanTextNode(textNode: Text, classColors: ClassColors, sensitivity: imp
 /**
  * Start observing DOM mutations to scan dynamically added content.
  */
-function startObserving(classColors: ClassColors, sensitivity: import('@/utils/charsets').SensitivityLevel = 'standard'): void {
+function startObserving(classColors: ClassColors, sensitivity: import('@/utils/charsets').SensitivityLevel = 'standard', detectEncrypted: boolean = false): void {
   if (observer) return;
 
   let pendingNodes: Node[] = [];
@@ -151,14 +153,14 @@ function startObserving(classColors: ClassColors, sensitivity: import('@/utils/c
 
     for (const node of nodes) {
       if (node.nodeType === Node.TEXT_NODE) {
-        const findings = scanTextNode(node as Text, classColors, sensitivity);
+        const findings = scanTextNode(node as Text, classColors, sensitivity, detectEncrypted);
         totalFindings += findings.length;
         allFindings.push(...findings);
       } else if (node.nodeType === Node.ELEMENT_NODE) {
         const walker = createScanWalker(node);
         let textNode: Node | null;
         while ((textNode = walker.nextNode())) {
-          const findings = scanTextNode(textNode as Text, classColors, sensitivity);
+          const findings = scanTextNode(textNode as Text, classColors, sensitivity, detectEncrypted);
           totalFindings += findings.length;
           allFindings.push(...findings);
         }
@@ -212,8 +214,10 @@ async function performFullScan(): Promise<{ count: number }> {
   const tagsColor = await tagsColorSetting.getValue();
   const zerowColor = await zerowColorSetting.getValue();
   const watermarkColor = await watermarkColorSetting.getValue();
+  const encryptedColor = await encryptedColorSetting.getValue();
   const sensitivity = await sensitivitySetting.getValue();
-  const classColors: ClassColors = { tags: tagsColor, zerowidth: zerowColor, watermark: watermarkColor };
+  const detectEncrypted = await detectEncryptedSetting.getValue();
+  const classColors: ClassColors = { tags: tagsColor, zerowidth: zerowColor, watermark: watermarkColor, encrypted: encryptedColor };
 
   scanActive = true;
   totalFindings = 0;
@@ -229,13 +233,13 @@ async function performFullScan(): Promise<{ count: number }> {
   }
 
   for (const textNode of textNodes) {
-    const findings = scanTextNode(textNode, classColors, sensitivity);
+    const findings = scanTextNode(textNode, classColors, sensitivity, detectEncrypted);
     totalFindings += findings.length;
     allFindings.push(...findings);
   }
 
   // Start observing for dynamic content
-  startObserving(classColors, sensitivity);
+  startObserving(classColors, sensitivity, detectEncrypted);
 
   return { count: totalFindings };
 }
@@ -335,6 +339,11 @@ export default defineContentScript({
 
       watermarkColorSetting.watch((newColor) => {
         document.querySelectorAll<HTMLElement>('[data-iu-highlight][data-iu-type="watermark"]')
+          .forEach(el => { el.style.backgroundColor = newColor; });
+      });
+
+      encryptedColorSetting.watch((newColor) => {
+        document.querySelectorAll<HTMLElement>('[data-iu-highlight][data-iu-type="encrypted"]')
           .forEach(el => { el.style.backgroundColor = newColor; });
       });
     } catch { /* restricted page — no storage access */ }

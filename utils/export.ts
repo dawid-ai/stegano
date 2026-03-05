@@ -14,12 +14,13 @@ export interface ScanReport {
     tags: number;
     zerowidth: number;
     watermark: number;
+    encrypted: number;
   };
   findings: ScanReportFinding[];
 }
 
 interface ScanReportFinding {
-  type: 'tags' | 'zerowidth' | 'watermark';
+  type: 'tags' | 'zerowidth' | 'watermark' | 'encrypted';
   replacement: string;
   codepoints: string[];
   position: { start: number; end: number };
@@ -33,7 +34,7 @@ interface ScanReportFinding {
  */
 export function buildScanReport(data: {
   findings: Array<{
-    type: 'tags' | 'zerowidth' | 'watermark';
+    type: 'tags' | 'zerowidth' | 'watermark' | 'encrypted';
     replacement: string;
     original: string;
     codepoints: string[];
@@ -42,7 +43,7 @@ export function buildScanReport(data: {
   url: string;
   timestamp: string;
 }): ScanReport {
-  const summary = { total: 0, tags: 0, zerowidth: 0, watermark: 0 };
+  const summary = { total: 0, tags: 0, zerowidth: 0, watermark: 0, encrypted: 0 };
   const reportFindings: ScanReportFinding[] = [];
 
   for (const f of data.findings) {
