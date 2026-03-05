@@ -62,11 +62,11 @@
 
 ### Encryption UX
 
-- [ ] **EUXP-01**: Popup encode section has password field with show/hide toggle and encrypt button
+- [x] **EUXP-01**: Popup encode section has password field with show/hide toggle and encrypt button
 - [x] **EUXP-02**: Popup decode section auto-detects encrypted content and shows password prompt
-- [ ] **EUXP-03**: Character count display shows encrypted vs unencrypted invisible character count (e.g., "142 chars (72 without encryption)")
-- [ ] **EUXP-04**: Compression toggle shows compressed vs uncompressed character count comparison
-- [ ] **EUXP-05**: Copy encrypted output to clipboard works the same as unencrypted
+- [x] **EUXP-03**: Character count display shows encrypted vs unencrypted invisible character count (e.g., "142 chars (72 without encryption)")
+- [x] **EUXP-04**: Compression toggle shows compressed vs uncompressed character count comparison
+- [x] **EUXP-05**: Copy encrypted output to clipboard works the same as unencrypted
 
 ### Encrypted Content Detection
 
@@ -159,11 +159,11 @@
 | ENCR-04 | Phase 7 | Complete |
 | ENCR-05 | Phase 7 | Complete |
 | ENCR-06 | Phase 7 | Complete |
-| EUXP-01 | Phase 8 | Pending |
+| EUXP-01 | Phase 8 | Complete |
 | EUXP-02 | Phase 8 | Complete |
-| EUXP-03 | Phase 8 | Pending |
-| EUXP-04 | Phase 8 | Pending |
-| EUXP-05 | Phase 8 | Pending |
+| EUXP-03 | Phase 8 | Complete |
+| EUXP-04 | Phase 8 | Complete |
+| EUXP-05 | Phase 8 | Complete |
 | EDET-01 | Phase 9 | Pending |
 | EDET-02 | Phase 9 | Pending |
 | EDET-03 | Phase 11 | Pending |
