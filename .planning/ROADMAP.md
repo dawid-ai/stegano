@@ -144,7 +144,7 @@ Plans:
 **Plans:** 2/2 plans complete
 Plans:
 - [x] 07-01-PLAN.md — Compression and markers modules (TDD)
-- [ ] 07-02-PLAN.md — Core crypto module with AES-256-GCM and full pipeline integration (TDD)
+- [x] 07-02-PLAN.md — Core crypto module with AES-256-GCM and full pipeline integration (TDD)
 
 #### Phase 8: Popup Encrypt/Decrypt UI
 **Goal**: Users can encrypt and decrypt text with passwords directly in the popup, with clear feedback on character count impact
@@ -156,7 +156,10 @@ Plans:
   3. Character count display shows both encrypted and unencrypted character counts side by side (e.g., "142 chars (72 without encryption)") so the user understands the cost
   4. User can toggle compression on/off and immediately see the character count difference update
   5. Copying encrypted output to clipboard works identically to copying unencrypted output (same button, same confirmation)
-**Plans**: TBD
+**Plans:** 2 plans
+Plans:
+- [ ] 08-01-PLAN.md — Compress option for crypto module + encryption UI in popup encode section
+- [ ] 08-02-PLAN.md — Encrypted content auto-detection and decrypt UI in popup decode section
 
 #### Phase 9: Scanner Integration
 **Goal**: The page scanner detects encrypted hidden text and displays it with a distinct visual treatment separate from other invisible character classes
@@ -205,8 +208,8 @@ Note: Phases 9 and 10 can be parallelized (Phase 9 depends on Phase 7 only; Phas
 | 4. Popup UI | v1.0 | 1/1 | Complete | 2026-02-20 |
 | 5. Differentiating Features | v1.0 | 3/3 | Complete | 2026-02-21 |
 | 6. Chrome Web Store Submission | v1.0 | 2/2 | Complete | 2026-02-21 |
-| 7. Core Encryption Pipeline | 2/2 | Complete   | 2026-03-04 | - |
-| 8. Popup Encrypt/Decrypt UI | v1.1 | 0/? | Not started | - |
+| 7. Core Encryption Pipeline | v1.1 | 2/2 | Complete | 2026-03-04 |
+| 8. Popup Encrypt/Decrypt UI | v1.1 | 0/2 | Not started | - |
 | 9. Scanner Integration | v1.1 | 0/? | Not started | - |
 | 10. Password Management | v1.1 | 0/? | Not started | - |
 | 11. Inline Decryption | v1.1 | 0/? | Not started | - |

@@ -63,7 +63,7 @@
 ### Encryption UX
 
 - [ ] **EUXP-01**: Popup encode section has password field with show/hide toggle and encrypt button
-- [ ] **EUXP-02**: Popup decode section auto-detects encrypted content and shows password prompt
+- [x] **EUXP-02**: Popup decode section auto-detects encrypted content and shows password prompt
 - [ ] **EUXP-03**: Character count display shows encrypted vs unencrypted invisible character count (e.g., "142 chars (72 without encryption)")
 - [ ] **EUXP-04**: Compression toggle shows compressed vs uncompressed character count comparison
 - [ ] **EUXP-05**: Copy encrypted output to clipboard works the same as unencrypted
@@ -160,7 +160,7 @@
 | ENCR-05 | Phase 7 | Complete |
 | ENCR-06 | Phase 7 | Complete |
 | EUXP-01 | Phase 8 | Pending |
-| EUXP-02 | Phase 8 | Pending |
+| EUXP-02 | Phase 8 | Complete |
 | EUXP-03 | Phase 8 | Pending |
 | EUXP-04 | Phase 8 | Pending |
 | EUXP-05 | Phase 8 | Pending |
