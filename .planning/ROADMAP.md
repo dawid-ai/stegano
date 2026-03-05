@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 MVP** - Phases 1-6 (shipped 2026-02-21)
-- 🚧 **v1.1 Encrypted Hidden Text** - Phases 7-11 (in progress)
+- ✅ **v1.1 Encrypted Hidden Text** - Phases 7-11 (completed 2026-03-05)
 
 ## Phases
 
@@ -29,7 +29,7 @@
 - [ ] **Phase 8: Popup Encrypt/Decrypt UI** - Password fields, encrypt toggle, character count display in popup
 - [x] **Phase 9: Scanner Integration** - Detect encrypted content on pages with distinct color and label (completed 2026-03-05)
 - [x] **Phase 10: Password Management** - Save/edit/delete passwords, dropdown in popup, snippet linking (completed 2026-03-05)
-- [ ] **Phase 11: Inline Decryption** - Click encrypted highlight to enter password and see decrypted text in place
+- [x] **Phase 11: Inline Decryption** - Click encrypted highlight to enter password and see decrypted text in place (completed 2026-03-05)
 
 ## Phase Details
 
@@ -127,7 +127,7 @@ Plans:
 
 </details>
 
-### 🚧 v1.1 Encrypted Hidden Text (In Progress)
+### ✅ v1.1 Encrypted Hidden Text (Completed 2026-03-05)
 
 **Milestone Goal:** Add password-based encryption to invisible text so groups can hide messages that are unreadable even to those who know about invisible Unicode.
 
@@ -197,9 +197,9 @@ Plans:
   2. After entering the correct password, the decrypted plaintext replaces the encrypted highlight inline on the page
   3. After entering the wrong password, the user sees an error message and can retry without the highlight being destroyed
   4. If the user has saved passwords, they can select from a dropdown in the inline prompt instead of typing
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
-- [ ] 11-01-PLAN.md — Shadow DOM inline decrypt prompt with click handlers, saved password dropdown, and content script wiring
+- [x] 11-01-PLAN.md — Shadow DOM inline decrypt prompt with click handlers, saved password dropdown, and content script wiring
 
 ## Progress
 
@@ -219,5 +219,5 @@ Note: Phases 9 and 10 can be parallelized (Phase 9 depends on Phase 7 only; Phas
 | 7. Core Encryption Pipeline | v1.1 | 2/2 | Complete | 2026-03-04 |
 | 8. Popup Encrypt/Decrypt UI | v1.1 | 2/2 | Complete | 2026-03-05 |
 | 9. Scanner Integration | v1.1 | 2/2 | Complete | 2026-03-05 |
-| 10. Password Management | v1.1 | Complete    | 2026-03-05 | 2026-03-05 |
-| 11. Inline Decryption | v1.1 | 0/1 | Not started | - |
+| 10. Password Management | v1.1 | 2/2 | Complete | 2026-03-05 |
+| 11. Inline Decryption | v1.1 | 1/1 | Complete | 2026-03-05 |

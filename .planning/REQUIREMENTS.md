@@ -72,8 +72,8 @@
 
 - [x] **EDET-01**: Page scanner detects encrypted hidden text via marker prefix in decoded Tags runs
 - [x] **EDET-02**: Encrypted hidden text is highlighted with distinct color and "[Encrypted]" label, separate from regular tags/zerowidth/watermark
-- [ ] **EDET-03**: User can click encrypted highlight to trigger inline password prompt
-- [ ] **EDET-04**: After entering correct password, decrypted text replaces the encrypted highlight inline
+- [x] **EDET-03**: User can click encrypted highlight to trigger inline password prompt
+- [x] **EDET-04**: After entering correct password, decrypted text replaces the encrypted highlight inline
 - [x] **EDET-05**: Auto-detect encrypted content option in settings (manual trigger by default)
 
 ### Password Management
@@ -166,8 +166,8 @@
 | EUXP-05 | Phase 8 | Complete |
 | EDET-01 | Phase 9 | Complete |
 | EDET-02 | Phase 9 | Complete |
-| EDET-03 | Phase 11 | Pending |
-| EDET-04 | Phase 11 | Pending |
+| EDET-03 | Phase 11 | Complete |
+| EDET-04 | Phase 11 | Complete |
 | EDET-05 | Phase 9 | Complete |
 | PASS-01 | Phase 10 | Complete |
 | PASS-02 | Phase 10 | Complete |
