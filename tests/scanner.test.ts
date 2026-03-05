@@ -376,3 +376,111 @@ describe('watermark detection', () => {
     }
   });
 });
+
+// ---------------------------------------------------------------------------
+// Encrypted detection
+// ---------------------------------------------------------------------------
+
+describe('encrypted detection', () => {
+  it('classifies Tags run with ENC1: prefix as encrypted when detectEncrypted is true', () => {
+    const hidden = tagsEncode('ENC1:SGVsbG8=');
+    const text = 'before' + hidden + 'after';
+    const findings = findInvisibleChars(text, 'standard', { detectEncrypted: true });
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0].type).toBe('encrypted');
+    expect(findings[0].replacement).toBe('[Encrypted]');
+  });
+
+  it('classifies same Tags run as tags when detectEncrypted is false (default)', () => {
+    const hidden = tagsEncode('ENC1:SGVsbG8=');
+    const text = 'before' + hidden + 'after';
+
+    // Explicit false
+    const findings1 = findInvisibleChars(text, 'standard', { detectEncrypted: false });
+    expect(findings1).toHaveLength(1);
+    expect(findings1[0].type).toBe('tags');
+    expect(findings1[0].replacement).toBe('ENC1:SGVsbG8=');
+
+    // No options at all
+    const findings2 = findInvisibleChars(text, 'standard');
+    expect(findings2).toHaveLength(1);
+    expect(findings2[0].type).toBe('tags');
+    expect(findings2[0].replacement).toBe('ENC1:SGVsbG8=');
+  });
+
+  it('encrypted finding shows [Encrypted] replacement, not the Base64 payload', () => {
+    const hidden = tagsEncode('ENC1:dGVzdA==');
+    const findings = findInvisibleChars(hidden, 'standard', { detectEncrypted: true });
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0].replacement).toBe('[Encrypted]');
+    expect(findings[0].replacement).not.toContain('dGVzdA==');
+  });
+
+  it('does NOT detect "ENCODE something" as encrypted (no false positive)', () => {
+    const hidden = tagsEncode('ENCODE something');
+    const findings = findInvisibleChars(hidden, 'standard', { detectEncrypted: true });
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0].type).toBe('tags');
+    expect(findings[0].replacement).toBe('ENCODE something');
+  });
+
+  it('does NOT detect "ENC1" (no colon) as encrypted', () => {
+    const hidden = tagsEncode('ENC1 data without colon');
+    const findings = findInvisibleChars(hidden, 'standard', { detectEncrypted: true });
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0].type).toBe('tags');
+  });
+
+  it('does NOT detect "enc1:" (lowercase) as encrypted (case-sensitive)', () => {
+    const hidden = tagsEncode('enc1:SGVsbG8=');
+    const findings = findInvisibleChars(hidden, 'standard', { detectEncrypted: true });
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0].type).toBe('tags');
+  });
+
+  it('detects "ENC1:" followed by valid Base64 as encrypted', () => {
+    const hidden = tagsEncode('ENC1:YWJjZGVm');
+    const findings = findInvisibleChars(hidden, 'standard', { detectEncrypted: true });
+
+    expect(findings).toHaveLength(1);
+    expect(findings[0].type).toBe('encrypted');
+    expect(findings[0].replacement).toBe('[Encrypted]');
+  });
+
+  it('correctly classifies mixed content with encrypted + zerowidth + watermark', () => {
+    const encrypted = tagsEncode('ENC1:SGVsbG8=');
+    const text = encrypted + '\u200B' + '\u202F';
+    const findings = findInvisibleChars(text, 'standard', { detectEncrypted: true });
+
+    expect(findings).toHaveLength(3);
+
+    const encFinding = findings.find((f) => f.type === 'encrypted');
+    expect(encFinding).toBeDefined();
+    expect(encFinding!.replacement).toBe('[Encrypted]');
+
+    const zwFinding = findings.find((f) => f.type === 'zerowidth');
+    expect(zwFinding).toBeDefined();
+
+    const wmFinding = findings.find((f) => f.type === 'watermark');
+    expect(wmFinding).toBeDefined();
+  });
+
+  it('findInvisibleChars with no options behaves identically to before (backward compatible)', () => {
+    const hidden = tagsEncode('hello');
+    const text = 'a' + hidden + '\u200B' + 'b';
+
+    const findingsNoOpts = findInvisibleChars(text);
+    const findingsDefault = findInvisibleChars(text, 'standard');
+
+    expect(findingsNoOpts).toEqual(findingsDefault);
+    expect(findingsNoOpts).toHaveLength(2);
+    expect(findingsNoOpts[0].type).toBe('tags');
+    expect(findingsNoOpts[0].replacement).toBe('hello');
+    expect(findingsNoOpts[1].type).toBe('zerowidth');
+  });
+});
