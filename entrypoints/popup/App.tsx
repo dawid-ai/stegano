@@ -15,6 +15,8 @@ import { copyToClipboard } from '@/utils/clipboard';
 import { sendMessage } from '@/utils/messaging';
 import { buildScanReport } from '@/utils/export';
 import { themeSetting, autoCopyOnEncodeSetting } from '@/utils/storage';
+import { encryptToInvisible, decryptFromInvisible, DecryptionError } from '@/utils/crypto';
+import { detectEncrypted } from '@/utils/markers';
 
 export function App() {
   const [encodeInput, setEncodeInput] = useState('');
@@ -26,6 +28,17 @@ export function App() {
   const [exportStatus, setExportStatus] = useState<'idle' | 'success' | 'empty' | 'fail'>('idle');
   const [scanActive, setScanActive] = useState(false);
   const [autoCopy, setAutoCopy] = useState(false);
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [useCompression, setUseCompression] = useState(true);
+  const [encrypting, setEncrypting] = useState(false);
+  const [plainCharCount, setPlainCharCount] = useState<number | null>(null);
+  const [isEncryptedInput, setIsEncryptedInput] = useState(false);
+  const [encryptedRawInput, setEncryptedRawInput] = useState('');
+  const [decryptPassword, setDecryptPassword] = useState('');
+  const [showDecryptPassword, setShowDecryptPassword] = useState(false);
+  const [decrypting, setDecrypting] = useState(false);
+  const [decryptError, setDecryptError] = useState('');
   const copyTimer = useRef<number>(0);
   const exportTimer = useRef<number>(0);
 
@@ -74,10 +87,22 @@ export function App() {
     exportTimer.current = window.setTimeout(() => setExportStatus('idle'), 2000);
   }
 
-  /** Encode the input text into invisible Tags block Unicode. */
+  /** Encode (or encrypt) the input text into invisible Tags block Unicode. */
   async function handleEncode() {
     try {
-      const result = encode(encodeInput);
+      let result: string;
+      if (password) {
+        setEncrypting(true);
+        try {
+          result = await encryptToInvisible(encodeInput, password, { compress: useCompression });
+          setPlainCharCount([...encode(encodeInput)].length);
+        } finally {
+          setEncrypting(false);
+        }
+      } else {
+        result = encode(encodeInput);
+        setPlainCharCount(null);
+      }
       setEncodeOutput(result);
       setError('');
       if (autoCopy) {
@@ -95,7 +120,45 @@ export function App() {
   /** Live-decode pasted invisible text as the user types. */
   function handleDecodeInput(value: string) {
     setDecodeInput(value);
-    setDecodeOutput(decode(value));
+    setDecryptError('');
+    setDecryptPassword('');
+
+    const decoded = decode(value);
+    const detection = detectEncrypted(decoded);
+
+    if (detection.encrypted) {
+      setIsEncryptedInput(true);
+      setEncryptedRawInput(value);
+      setDecodeOutput('');
+    } else {
+      setIsEncryptedInput(false);
+      setEncryptedRawInput('');
+      setDecodeOutput(decoded);
+    }
+  }
+
+  /** Decrypt encrypted invisible text with the user-supplied password. */
+  async function handleDecrypt() {
+    if (!encryptedRawInput || !decryptPassword) return;
+    setDecrypting(true);
+    setDecryptError('');
+    try {
+      const result = await decryptFromInvisible(encryptedRawInput, decryptPassword);
+      if (result === null) {
+        setDecryptError('Content is not encrypted');
+        return;
+      }
+      setDecodeOutput(result);
+      setIsEncryptedInput(false);
+    } catch (e) {
+      if (e instanceof DecryptionError) {
+        setDecryptError('Wrong password or corrupted data');
+      } else {
+        setDecryptError('Decryption failed');
+      }
+    } finally {
+      setDecrypting(false);
+    }
   }
 
   /** Copy the encoded output to the clipboard with success/fail feedback. */
@@ -224,19 +287,47 @@ export function App() {
           value={encodeInput}
           onInput={(e) => {
             setEncodeInput((e.target as HTMLTextAreaElement).value);
+            setPlainCharCount(null);
             if (error) setError('');
           }}
           placeholder="Type or paste text to encode..."
           class="w-full h-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
         />
+        <div class="relative">
+          <input
+            type={showPassword ? 'text' : 'password'}
+            value={password}
+            onInput={(e) => setPassword((e.target as HTMLInputElement).value)}
+            placeholder="Password (optional — enables encryption)"
+            class="w-full px-3 py-1.5 pr-16 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 px-1.5 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+          >
+            {showPassword ? 'Hide' : 'Show'}
+          </button>
+        </div>
+        {password && (
+          <label class="flex items-center gap-2 text-xs text-gray-600 dark:text-gray-400">
+            <input
+              type="checkbox"
+              checked={useCompression}
+              onChange={() => setUseCompression(!useCompression)}
+              class="rounded border-gray-300 dark:border-gray-600"
+            />
+            Compress before encrypting
+          </label>
+        )}
         <div class="flex items-center gap-2">
           <button
             type="button"
             onClick={handleEncode}
-            disabled={!encodeInput}
+            disabled={!encodeInput || encrypting}
             class="px-4 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
           >
-            Encode
+            {encrypting ? 'Encrypting...' : password ? 'Encrypt' : 'Encode'}
           </button>
           <button
             type="button"
@@ -268,7 +359,9 @@ export function App() {
               class="w-full h-16 px-3 py-2 border border-gray-200 dark:border-gray-700 rounded-md resize-none bg-gray-100 dark:bg-gray-800 text-sm text-transparent select-all"
             />
             <p class="text-xs text-gray-500 dark:text-gray-400">
-              {[...encodeOutput].length} invisible characters
+              {plainCharCount !== null
+                ? `${[...encodeOutput].length} chars (${plainCharCount} without encryption)`
+                : `${[...encodeOutput].length} invisible characters`}
             </p>
           </div>
         )}
@@ -287,6 +380,44 @@ export function App() {
           placeholder="Paste invisible Unicode to decode..."
           class="w-full h-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
         />
+        {isEncryptedInput && (
+          <div class="flex flex-col gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-md">
+            <p class="text-xs font-medium text-amber-800 dark:text-amber-200">
+              Encrypted content detected — enter password to decrypt
+            </p>
+            <div class="relative">
+              <input
+                type={showDecryptPassword ? 'text' : 'password'}
+                value={decryptPassword}
+                onInput={(e) => {
+                  setDecryptPassword((e.target as HTMLInputElement).value);
+                  if (decryptError) setDecryptError('');
+                }}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleDecrypt(); }}
+                placeholder="Enter password"
+                class="w-full px-3 py-1.5 pr-16 border border-amber-300 dark:border-amber-700 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+              />
+              <button
+                type="button"
+                onClick={() => setShowDecryptPassword(!showDecryptPassword)}
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 px-1.5 py-0.5 rounded hover:bg-gray-200 dark:hover:bg-gray-700"
+              >
+                {showDecryptPassword ? 'Hide' : 'Show'}
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={handleDecrypt}
+              disabled={!decryptPassword || decrypting}
+              class="px-4 py-1.5 bg-amber-600 text-white text-xs font-medium rounded-md hover:bg-amber-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              {decrypting ? 'Decrypting...' : 'Decrypt'}
+            </button>
+            {decryptError && (
+              <p class="text-xs text-red-600 dark:text-red-400">{decryptError}</p>
+            )}
+          </div>
+        )}
         {decodeOutput && (
           <textarea
             value={decodeOutput}
