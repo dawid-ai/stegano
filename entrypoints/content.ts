@@ -14,6 +14,7 @@
 import { onMessage } from '@/utils/messaging';
 import { findInvisibleChars, type ScanFinding } from '@/utils/scanner';
 import { tagsColorSetting, zerowColorSetting, watermarkColorSetting, encryptedColorSetting, detectEncryptedSetting, sensitivitySetting, scanModeSetting } from '@/utils/storage';
+import { attachEncryptedClickHandlers } from './content/decrypt-prompt';
 
 /** Tags to skip when walking the DOM */
 const SKIP_TAGS = new Set([
@@ -166,6 +167,9 @@ function startObserving(classColors: ClassColors, sensitivity: import('@/utils/c
         }
       }
     }
+
+    // Bind click handlers to any newly added encrypted highlights
+    attachEncryptedClickHandlers();
   }
 
   observer = new MutationObserver((mutations) => {
@@ -181,6 +185,16 @@ function startObserving(classColors: ClassColors, sensitivity: import('@/utils/c
           continue;
         if (
           node.parentElement?.closest('[data-iu-highlight]')
+        )
+          continue;
+        // Skip decrypt prompt elements (Shadow DOM containers)
+        if (
+          node instanceof HTMLElement &&
+          node.hasAttribute('data-iu-decrypt-prompt')
+        )
+          continue;
+        if (
+          node.parentElement?.closest('[data-iu-decrypt-prompt]')
         )
           continue;
 
@@ -238,6 +252,9 @@ async function performFullScan(): Promise<{ count: number }> {
     allFindings.push(...findings);
   }
 
+  // Attach click handlers to encrypted highlights for inline decryption
+  attachEncryptedClickHandlers();
+
   // Start observing for dynamic content
   startObserving(classColors, sensitivity, detectEncrypted);
 
@@ -293,6 +310,8 @@ export default defineContentScript({
 
     // Clear all highlights and restore original DOM
     onMessage('clearScan', () => {
+      // Remove any open decrypt prompts
+      document.querySelectorAll('[data-iu-decrypt-prompt]').forEach(el => el.remove());
       clearAllHighlights();
       stopObserving();
       scanActive = false;
