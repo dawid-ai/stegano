@@ -27,7 +27,7 @@
 
 - [x] **Phase 7: Core Encryption Pipeline** - Wire format, AES-256-GCM encryption, compression, marker protocol (completed 2026-03-04)
 - [ ] **Phase 8: Popup Encrypt/Decrypt UI** - Password fields, encrypt toggle, character count display in popup
-- [ ] **Phase 9: Scanner Integration** - Detect encrypted content on pages with distinct color and label
+- [x] **Phase 9: Scanner Integration** - Detect encrypted content on pages with distinct color and label (completed 2026-03-05)
 - [ ] **Phase 10: Password Management** - Save/edit/delete passwords, dropdown in popup, snippet linking
 - [ ] **Phase 11: Inline Decryption** - Click encrypted highlight to enter password and see decrypted text in place
 
@@ -213,6 +213,6 @@ Note: Phases 9 and 10 can be parallelized (Phase 9 depends on Phase 7 only; Phas
 | 6. Chrome Web Store Submission | v1.0 | 2/2 | Complete | 2026-02-21 |
 | 7. Core Encryption Pipeline | v1.1 | 2/2 | Complete | 2026-03-04 |
 | 8. Popup Encrypt/Decrypt UI | v1.1 | 2/2 | Complete | 2026-03-05 |
-| 9. Scanner Integration | v1.1 | 2/2 | Checkpoint | - |
+| 9. Scanner Integration | v1.1 | 2/2 | Complete | 2026-03-05 |
 | 10. Password Management | v1.1 | 0/? | Not started | - |
 | 11. Inline Decryption | v1.1 | 0/? | Not started | - |
