@@ -10,7 +10,7 @@
 
 import { useState, useEffect } from 'preact/hooks';
 import { browser } from 'wxt/browser';
-import type { Snippet, ScanMode } from '@/utils/types';
+import type { Snippet, ScanMode, SavedPassword } from '@/utils/types';
 import type { SensitivityLevel } from '@/utils/charsets';
 import { encode, decode } from '@/utils/codec';
 import {
@@ -18,6 +18,10 @@ import {
   addSnippet,
   updateSnippet,
   deleteSnippet,
+  passwordsSetting,
+  addPassword,
+  updatePassword,
+  deletePassword,
   themeSetting,
   tagsColorSetting,
   zerowColorSetting,
@@ -66,6 +70,13 @@ export function App() {
   const [detectEncrypted, setDetectEncrypted] = useState(false);
   const [snippetPasteMode, setSnippetPasteMode] = useState<'paste' | 'copy'>('paste');
 
+  // Password management state
+  const [passwords, setPasswords] = useState<SavedPassword[]>([]);
+  const [editingPasswordId, setEditingPasswordId] = useState<string | null>(null);
+  const [editPasswordForm, setEditPasswordForm] = useState({ name: '', password: '' });
+  const [createPasswordForm, setCreatePasswordForm] = useState({ name: '', password: '' });
+  const [showPasswordValues, setShowPasswordValues] = useState<Record<string, boolean>>({});
+
   /** Check a storage result and set/clear the error banner */
   function handleStorageResult(result: StorageResult): boolean {
     if (!result.ok) {
@@ -92,7 +103,11 @@ export function App() {
     encryptedColorSetting.getValue().then(setEncryptedColor);
     detectEncryptedSetting.getValue().then(setDetectEncrypted);
     snippetPasteModeSetting.getValue().then(setSnippetPasteMode);
+    passwordsSetting.getValue().then(setPasswords);
 
+    const unwatchPasswords = passwordsSetting.watch((newVal) => {
+      if (newVal) setPasswords(newVal);
+    });
     const unwatchSnippets = snippetsSetting.watch((newVal) => {
       if (newVal) {
         setSnippets(newVal);
@@ -106,6 +121,7 @@ export function App() {
     return () => {
       unwatchSnippets();
       unwatchTheme();
+      unwatchPasswords();
     };
   }, []);
 
@@ -174,6 +190,63 @@ export function App() {
     if (handleStorageResult(result)) {
       if (editingId === id) cancelEdit();
     }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Password handlers
+  // ---------------------------------------------------------------------------
+
+  /** Create a new saved password */
+  async function handleCreatePassword() {
+    if (!createPasswordForm.name.trim() || !createPasswordForm.password) return;
+    const pw: SavedPassword = {
+      id: crypto.randomUUID(),
+      name: createPasswordForm.name.trim(),
+      password: createPasswordForm.password,
+    };
+    const result = await addPassword(pw);
+    if (handleStorageResult(result)) {
+      setCreatePasswordForm({ name: '', password: '' });
+    }
+  }
+
+  /** Start editing a saved password inline */
+  function startPasswordEdit(pw: SavedPassword) {
+    setEditingPasswordId(pw.id);
+    setEditPasswordForm({ name: pw.name, password: pw.password });
+  }
+
+  /** Save edits to a password */
+  async function handleSavePasswordEdit() {
+    if (!editingPasswordId || !editPasswordForm.name.trim() || !editPasswordForm.password) return;
+    const result = await updatePassword(editingPasswordId, {
+      name: editPasswordForm.name.trim(),
+      password: editPasswordForm.password,
+    });
+    if (handleStorageResult(result)) {
+      setEditingPasswordId(null);
+      setEditPasswordForm({ name: '', password: '' });
+    }
+  }
+
+  /** Cancel password edit */
+  function cancelPasswordEdit() {
+    setEditingPasswordId(null);
+    setEditPasswordForm({ name: '', password: '' });
+  }
+
+  /** Delete a saved password (cascades to unlink snippets) */
+  async function handleDeletePassword(id: string) {
+    if (!confirm('Delete this password? Any snippets using it will be unlinked.')) return;
+    const result = await deletePassword(id);
+    if (handleStorageResult(result)) {
+      if (editingPasswordId === id) cancelPasswordEdit();
+    }
+  }
+
+  /** Toggle password visibility for a specific password row */
+  function togglePasswordVisibility(id: string) {
+    setShowPasswordValues((prev) => ({ ...prev, [id]: !prev[id] }));
   }
 
   return (
@@ -478,6 +551,172 @@ export function App() {
           </div>
         </section>
 
+        {/* Saved Passwords */}
+        <section class="mb-8 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <h2 class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-4">
+            Saved Passwords
+          </h2>
+
+          {/* Create Password Form */}
+          <div class="flex flex-col gap-3 mb-4">
+            <input
+              type="text"
+              value={createPasswordForm.name}
+              onInput={(e) =>
+                setCreatePasswordForm({
+                  ...createPasswordForm,
+                  name: (e.target as HTMLInputElement).value,
+                })
+              }
+              placeholder="Password name (e.g. 'Work encryption key')"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+            />
+            <div class="relative">
+              <input
+                type={showPasswordValues['create'] ? 'text' : 'password'}
+                value={createPasswordForm.password}
+                onInput={(e) =>
+                  setCreatePasswordForm({
+                    ...createPasswordForm,
+                    password: (e.target as HTMLInputElement).value,
+                  })
+                }
+                placeholder="Password value"
+                class="w-full px-3 py-2 pr-16 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+              />
+              <button
+                type="button"
+                onClick={() => togglePasswordVisibility('create')}
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-blue-600 hover:text-blue-800"
+              >
+                {showPasswordValues['create'] ? 'Hide' : 'Show'}
+              </button>
+            </div>
+            <button
+              type="button"
+              onClick={handleCreatePassword}
+              disabled={!createPasswordForm.name.trim() || !createPasswordForm.password}
+              class="self-start px-4 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Save Password
+            </button>
+          </div>
+
+          {/* Password List */}
+          {passwords.length === 0 ? (
+            <p class="text-xs text-gray-400 dark:text-gray-500 italic">
+              No passwords saved yet. Create one above.
+            </p>
+          ) : (
+            <div class="flex flex-col gap-3">
+              {passwords.map((pw) =>
+                editingPasswordId === pw.id ? (
+                  /* Inline Edit Form */
+                  <div
+                    key={pw.id}
+                    class="p-4 bg-gray-50 dark:bg-gray-750 rounded-lg border-2 border-blue-300 dark:border-blue-600"
+                  >
+                    <div class="flex flex-col gap-3">
+                      <input
+                        type="text"
+                        value={editPasswordForm.name}
+                        onInput={(e) =>
+                          setEditPasswordForm({
+                            ...editPasswordForm,
+                            name: (e.target as HTMLInputElement).value,
+                          })
+                        }
+                        placeholder="Password name"
+                        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                      />
+                      <div class="relative">
+                        <input
+                          type={showPasswordValues[pw.id] ? 'text' : 'password'}
+                          value={editPasswordForm.password}
+                          onInput={(e) =>
+                            setEditPasswordForm({
+                              ...editPasswordForm,
+                              password: (e.target as HTMLInputElement).value,
+                            })
+                          }
+                          placeholder="Password value"
+                          class="w-full px-3 py-2 pr-16 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => togglePasswordVisibility(pw.id)}
+                          class="absolute right-2 top-1/2 -translate-y-1/2 text-[11px] text-blue-600 hover:text-blue-800"
+                        >
+                          {showPasswordValues[pw.id] ? 'Hide' : 'Show'}
+                        </button>
+                      </div>
+                      <div class="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={handleSavePasswordEdit}
+                          disabled={!editPasswordForm.name.trim() || !editPasswordForm.password}
+                          class="px-4 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                        >
+                          Save
+                        </button>
+                        <button
+                          type="button"
+                          onClick={cancelPasswordEdit}
+                          class="px-4 py-1.5 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  /* Password Display Row */
+                  <div
+                    key={pw.id}
+                    class="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-between gap-4"
+                  >
+                    <div class="flex-1 min-w-0">
+                      <p class="font-medium text-gray-800 dark:text-gray-100 truncate">
+                        {pw.name}
+                      </p>
+                      <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 font-mono">
+                        {showPasswordValues[pw.id] ? pw.password : '********'}
+                      </p>
+                    </div>
+                    <div class="flex gap-2 shrink-0">
+                      <button
+                        type="button"
+                        onClick={() => togglePasswordVisibility(pw.id)}
+                        class="px-3 py-1 text-xs text-gray-600 dark:text-gray-400 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                      >
+                        {showPasswordValues[pw.id] ? 'Hide' : 'Show'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => startPasswordEdit(pw)}
+                        class="px-3 py-1 text-xs text-blue-600 border border-blue-300 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900 transition-colors"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleDeletePassword(pw.id)}
+                        class="px-3 py-1 text-xs text-red-600 border border-red-300 rounded-md hover:bg-red-50 dark:hover:bg-red-900 transition-colors"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ),
+              )}
+            </div>
+          )}
+
+          <p class="text-[11px] text-gray-400 dark:text-gray-500 mt-3">
+            Passwords are stored locally on this device and are never synced across devices.
+          </p>
+        </section>
+
         {/* Create Form */}
         <section class="mb-8 p-4 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
           <h2 class="text-sm font-medium text-gray-700 dark:text-gray-200 mb-3">
@@ -593,11 +832,32 @@ export function App() {
                     <div class="flex-1 min-w-0">
                       <p class="font-medium text-gray-800 dark:text-gray-100 truncate">
                         {snippet.name}
+                        {snippet.passwordId && (
+                          <span class="ml-2 text-[11px] text-emerald-600 dark:text-emerald-400 font-normal">
+                            (encrypted)
+                          </span>
+                        )}
                       </p>
                       <p class="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">
                         {decode(snippet.content) || `[${[...snippet.content].length} invisible chars]`}
                       </p>
                     </div>
+                    {passwords.length > 0 && (
+                      <select
+                        value={snippet.passwordId || ''}
+                        onChange={(e) => {
+                          const val = (e.target as HTMLSelectElement).value;
+                          void updateSnippet(snippet.id, { passwordId: val || undefined });
+                        }}
+                        class="px-2 py-1 border border-gray-300 dark:border-gray-600 rounded-md text-xs focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                        title="Link a password for encrypted paste"
+                      >
+                        <option value="">No encryption</option>
+                        {passwords.map((pw) => (
+                          <option key={pw.id} value={pw.id}>{pw.name}</option>
+                        ))}
+                      </select>
+                    )}
                     <div class="flex gap-2 shrink-0">
                       <button
                         type="button"
