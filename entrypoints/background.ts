@@ -12,7 +12,9 @@
 
 import { browser } from 'wxt/browser';
 import { onMessage, sendMessage } from '@/utils/messaging';
-import { scanModeSetting, snippetsSetting, snippetPasteModeSetting } from '@/utils/storage';
+import { scanModeSetting, snippetsSetting, snippetPasteModeSetting, passwordsSetting } from '@/utils/storage';
+import { encryptToInvisible } from '@/utils/crypto';
+import { decode } from '@/utils/codec';
 
 /** URLs where content script injection is not allowed */
 const RESTRICTED_PREFIXES = ['chrome://', 'about:', 'chrome-extension://'];
@@ -177,9 +179,21 @@ export default defineBackground(() => {
 
     const mode = await snippetPasteModeSetting.getValue();
 
+    // Determine content to send — encrypt if snippet has a linked password
+    let contentToSend = snippet.content;
+    if (snippet.passwordId) {
+      const passwords = await passwordsSetting.getValue();
+      const linkedPw = passwords.find((p) => p.id === snippet.passwordId);
+      if (linkedPw) {
+        const plaintext = decode(snippet.content);
+        contentToSend = await encryptToInvisible(plaintext, linkedPw.password);
+      }
+      // If password was deleted (not found), fall back to unencrypted paste
+    }
+
     // Try sending to content script
     try {
-      await sendMessage('insertSnippet', { content: snippet.content, mode }, tab.id);
+      await sendMessage('insertSnippet', { content: contentToSend, mode }, tab.id);
     } catch {
       // Content script not loaded — inject and retry
       try {
@@ -187,14 +201,14 @@ export default defineBackground(() => {
           target: { tabId: tab.id },
           files: ['/content-scripts/content.js'],
         });
-        await sendMessage('insertSnippet', { content: snippet.content, mode }, tab.id);
+        await sendMessage('insertSnippet', { content: contentToSend, mode }, tab.id);
       } catch {
         // Fallback: copy to clipboard via scripting API (restricted page)
         try {
           await browser.scripting.executeScript({
             target: { tabId: tab.id },
             func: (text: string) => navigator.clipboard.writeText(text),
-            args: [snippet.content],
+            args: [contentToSend],
           });
         } catch {
           // Restricted page — fail silently
