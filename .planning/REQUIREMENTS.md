@@ -80,9 +80,9 @@
 
 - [x] **PASS-01**: User can save named passwords in settings (stored in chrome.storage.local)
 - [x] **PASS-02**: User can edit and delete saved passwords
-- [ ] **PASS-03**: Saved passwords appear as dropdown in popup encrypt/decrypt password fields
+- [x] **PASS-03**: Saved passwords appear as dropdown in popup encrypt/decrypt password fields
 - [x] **PASS-04**: User can link a saved password to a snippet for one-click encrypted encoding
-- [ ] **PASS-05**: Context menu encrypted paste uses linked snippet password automatically
+- [x] **PASS-05**: Context menu encrypted paste uses linked snippet password automatically
 
 ## v2 Requirements
 
@@ -171,9 +171,9 @@
 | EDET-05 | Phase 9 | Complete |
 | PASS-01 | Phase 10 | Complete |
 | PASS-02 | Phase 10 | Complete |
-| PASS-03 | Phase 10 | Pending |
+| PASS-03 | Phase 10 | Complete |
 | PASS-04 | Phase 10 | Complete |
-| PASS-05 | Phase 10 | Pending |
+| PASS-05 | Phase 10 | Complete |
 
 **Coverage:**
 - v1.0 requirements: 25 total (23 complete, 2 pending)

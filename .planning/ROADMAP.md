@@ -28,7 +28,7 @@
 - [x] **Phase 7: Core Encryption Pipeline** - Wire format, AES-256-GCM encryption, compression, marker protocol (completed 2026-03-04)
 - [ ] **Phase 8: Popup Encrypt/Decrypt UI** - Password fields, encrypt toggle, character count display in popup
 - [x] **Phase 9: Scanner Integration** - Detect encrypted content on pages with distinct color and label (completed 2026-03-05)
-- [ ] **Phase 10: Password Management** - Save/edit/delete passwords, dropdown in popup, snippet linking
+- [x] **Phase 10: Password Management** - Save/edit/delete passwords, dropdown in popup, snippet linking (completed 2026-03-05)
 - [ ] **Phase 11: Inline Decryption** - Click encrypted highlight to enter password and see decrypted text in place
 
 ## Phase Details
@@ -183,10 +183,10 @@ Plans:
   2. Saved passwords appear as a dropdown in the popup encrypt/decrypt password fields, letting the user select a saved password instead of typing it
   3. User can link a saved password to a snippet, and when using context menu to paste that snippet, it is automatically encrypted with the linked password
   4. Unlinking a password from a snippet reverts that snippet to unencrypted paste behavior
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 Plans:
-- [ ] 10-01-PLAN.md — Password data model, storage CRUD with cascade delete, settings UI for password management and snippet linking
-- [ ] 10-02-PLAN.md — Popup password dropdown and background encrypted paste for linked snippets
+- [x] 10-01-PLAN.md — Password data model, storage CRUD with cascade delete, settings UI for password management and snippet linking
+- [x] 10-02-PLAN.md — Popup password dropdown and background encrypted paste for linked snippets
 
 #### Phase 11: Inline Decryption
 **Goal**: Users can decrypt encrypted content directly on the page by clicking a highlight and entering a password, seeing the decrypted text replace the encrypted highlight in place
@@ -217,5 +217,5 @@ Note: Phases 9 and 10 can be parallelized (Phase 9 depends on Phase 7 only; Phas
 | 7. Core Encryption Pipeline | v1.1 | 2/2 | Complete | 2026-03-04 |
 | 8. Popup Encrypt/Decrypt UI | v1.1 | 2/2 | Complete | 2026-03-05 |
 | 9. Scanner Integration | v1.1 | 2/2 | Complete | 2026-03-05 |
-| 10. Password Management | 1/2 | In Progress|  | - |
+| 10. Password Management | v1.1 | 2/2 | Complete | 2026-03-05 |
 | 11. Inline Decryption | v1.1 | 0/? | Not started | - |
