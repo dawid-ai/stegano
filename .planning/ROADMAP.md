@@ -169,7 +169,7 @@ Plans:
   1. Scanner detects encrypted hidden text on a page (via the `ENC1:` marker in decoded Tags runs) and highlights it with a distinct color and "[Encrypted]" label, visually different from tags/zerowidth/watermark highlights
   2. Encrypted content detection is off by default (manual trigger) with an option in settings to enable auto-detection
   3. Scanner correctly distinguishes encrypted content from regular Tags block text that happens to start with "ENC" or similar strings (no false positives from non-encrypted content)
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 Plans:
 - [ ] 09-01-PLAN.md — Scanner encrypted detection with TDD tests, storage settings, and messaging types
 - [ ] 09-02-PLAN.md — Content script highlighting and settings UI for encrypted color and auto-detect toggle
@@ -213,6 +213,6 @@ Note: Phases 9 and 10 can be parallelized (Phase 9 depends on Phase 7 only; Phas
 | 6. Chrome Web Store Submission | v1.0 | 2/2 | Complete | 2026-02-21 |
 | 7. Core Encryption Pipeline | v1.1 | 2/2 | Complete | 2026-03-04 |
 | 8. Popup Encrypt/Decrypt UI | v1.1 | 0/2 | Not started | - |
-| 9. Scanner Integration | v1.1 | 0/2 | Not started | - |
+| 9. Scanner Integration | 1/2 | In Progress|  | - |
 | 10. Password Management | v1.1 | 0/? | Not started | - |
 | 11. Inline Decryption | v1.1 | 0/? | Not started | - |
