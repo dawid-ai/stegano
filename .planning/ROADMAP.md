@@ -197,7 +197,9 @@ Plans:
   2. After entering the correct password, the decrypted plaintext replaces the encrypted highlight inline on the page
   3. After entering the wrong password, the user sees an error message and can retry without the highlight being destroyed
   4. If the user has saved passwords, they can select from a dropdown in the inline prompt instead of typing
-**Plans**: TBD
+**Plans:** 1 plan
+Plans:
+- [ ] 11-01-PLAN.md — Shadow DOM inline decrypt prompt with click handlers, saved password dropdown, and content script wiring
 
 ## Progress
 
@@ -217,5 +219,5 @@ Note: Phases 9 and 10 can be parallelized (Phase 9 depends on Phase 7 only; Phas
 | 7. Core Encryption Pipeline | v1.1 | 2/2 | Complete | 2026-03-04 |
 | 8. Popup Encrypt/Decrypt UI | v1.1 | 2/2 | Complete | 2026-03-05 |
 | 9. Scanner Integration | v1.1 | 2/2 | Complete | 2026-03-05 |
-| 10. Password Management | v1.1 | 2/2 | Complete | 2026-03-05 |
-| 11. Inline Decryption | v1.1 | 0/? | Not started | - |
+| 10. Password Management | v1.1 | Complete    | 2026-03-05 | 2026-03-05 |
+| 11. Inline Decryption | v1.1 | 0/1 | Not started | - |
