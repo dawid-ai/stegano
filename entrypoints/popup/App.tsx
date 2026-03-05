@@ -14,9 +14,10 @@ import { encode, decode } from '@/utils/codec';
 import { copyToClipboard } from '@/utils/clipboard';
 import { sendMessage } from '@/utils/messaging';
 import { buildScanReport } from '@/utils/export';
-import { themeSetting, autoCopyOnEncodeSetting } from '@/utils/storage';
+import { themeSetting, autoCopyOnEncodeSetting, passwordsSetting } from '@/utils/storage';
 import { encryptToInvisible, decryptFromInvisible, DecryptionError } from '@/utils/crypto';
 import { detectEncrypted } from '@/utils/markers';
+import type { SavedPassword } from '@/utils/types';
 
 export function App() {
   const [encodeInput, setEncodeInput] = useState('');
@@ -39,6 +40,7 @@ export function App() {
   const [showDecryptPassword, setShowDecryptPassword] = useState(false);
   const [decrypting, setDecrypting] = useState(false);
   const [decryptError, setDecryptError] = useState('');
+  const [savedPasswords, setSavedPasswords] = useState<SavedPassword[]>([]);
   const copyTimer = useRef<number>(0);
   const exportTimer = useRef<number>(0);
 
@@ -48,10 +50,12 @@ export function App() {
       document.documentElement.classList.toggle('dark', theme === 'dark');
     });
     autoCopyOnEncodeSetting.getValue().then(setAutoCopy);
+    passwordsSetting.getValue().then(setSavedPasswords);
     const unwatch = themeSetting.watch((theme) => {
       document.documentElement.classList.toggle('dark', theme === 'dark');
     });
-    return () => { unwatch(); };
+    const unwatchPasswords = passwordsSetting.watch((pws) => setSavedPasswords(pws ?? []));
+    return () => { unwatch(); unwatchPasswords(); };
   }, []);
 
   // Check if scan is active on current tab (badge text is non-empty)
@@ -293,6 +297,21 @@ export function App() {
           placeholder="Type or paste text to encode..."
           class="w-full h-24 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md resize-none focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
         />
+        {savedPasswords.length > 0 && (
+          <select
+            value=""
+            onChange={(e) => {
+              const pw = savedPasswords.find(p => p.id === (e.target as HTMLSelectElement).value);
+              if (pw) setPassword(pw.password);
+            }}
+            class="w-full px-3 py-1.5 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+          >
+            <option value="">Select saved password...</option>
+            {savedPasswords.map(pw => (
+              <option key={pw.id} value={pw.id}>{pw.name}</option>
+            ))}
+          </select>
+        )}
         <div class="relative">
           <input
             type={showPassword ? 'text' : 'password'}
@@ -385,6 +404,21 @@ export function App() {
             <p class="text-xs font-medium text-amber-800 dark:text-amber-200">
               Encrypted content detected — enter password to decrypt
             </p>
+            {savedPasswords.length > 0 && (
+              <select
+                value=""
+                onChange={(e) => {
+                  const pw = savedPasswords.find(p => p.id === (e.target as HTMLSelectElement).value);
+                  if (pw) setDecryptPassword(pw.password);
+                }}
+                class="w-full px-3 py-1.5 border border-amber-300 dark:border-amber-700 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
+              >
+                <option value="">Select saved password...</option>
+                {savedPasswords.map(pw => (
+                  <option key={pw.id} value={pw.id}>{pw.name}</option>
+                ))}
+              </select>
+            )}
             <div class="relative">
               <input
                 type={showDecryptPassword ? 'text' : 'password'}
