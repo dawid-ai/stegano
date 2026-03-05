@@ -9,6 +9,7 @@
  */
 
 import { buildDetectionRegex, AI_WATERMARK_CHARS, type SensitivityLevel } from './charsets';
+import { detectEncrypted } from './markers';
 
 /** Tags block offset for mapping to/from ASCII */
 const TAGS_OFFSET = 0xe0000;
@@ -37,7 +38,7 @@ export interface ScanFinding {
   /** Human-readable replacement text */
   replacement: string;
   /** Character class */
-  type: 'tags' | 'zerowidth' | 'watermark';
+  type: 'tags' | 'zerowidth' | 'watermark' | 'encrypted';
 }
 
 /**
@@ -110,9 +111,16 @@ function classifyCodepoint(cp: number): 'tags' | 'watermark' | 'zerowidth' {
  * @param sensitivity - Detection sensitivity level (default: 'standard')
  * @returns Array of findings, sorted by start position
  */
+/** Options for findInvisibleChars */
+export interface ScanOptions {
+  /** When true, Tags runs with ENC1: prefix are classified as 'encrypted' */
+  detectEncrypted?: boolean;
+}
+
 export function findInvisibleChars(
   text: string,
-  sensitivity: SensitivityLevel = 'standard'
+  sensitivity: SensitivityLevel = 'standard',
+  options?: ScanOptions,
 ): ScanFinding[] {
   if (text === '') return [];
 
@@ -167,12 +175,23 @@ export function findInvisibleChars(
         }
       }
 
+      const decoded = decodeTagsRun(runOriginal);
+      let findingType: ScanFinding['type'] = 'tags';
+      let replacement = decoded;
+      if (options?.detectEncrypted) {
+        const markerResult = detectEncrypted(decoded);
+        if (markerResult.encrypted) {
+          findingType = 'encrypted';
+          replacement = '[Encrypted]';
+        }
+      }
+
       findings.push({
         start: runStart,
         end: runEnd,
         original: runOriginal,
-        replacement: decodeTagsRun(runOriginal),
-        type: 'tags',
+        replacement,
+        type: findingType,
       });
 
       i = j;

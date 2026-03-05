@@ -94,6 +94,18 @@ export const snippetPasteModeSetting = storage.defineItem<'paste' | 'copy'>(
   { fallback: 'paste' },
 );
 
+/** Whether to detect encrypted content (ENC1: prefix) within Tags runs */
+export const detectEncryptedSetting = storage.defineItem<boolean>(
+  'sync:detectEncrypted',
+  { fallback: false },
+);
+
+/** Per-class highlight color for encrypted content findings */
+export const encryptedColorSetting = storage.defineItem<string>(
+  'sync:encryptedColor',
+  { fallback: '#00BCD4' },
+);
+
 /** Saved invisible Unicode snippets for quick-paste */
 export const snippetsSetting = storage.defineItem<Snippet[]>(
   'sync:snippets',

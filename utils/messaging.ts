@@ -17,7 +17,7 @@ export interface ScanResult {
 
 /** A single finding serialized for cross-context messaging */
 export interface FindingEntry {
-  type: 'tags' | 'zerowidth' | 'watermark';
+  type: 'tags' | 'zerowidth' | 'watermark' | 'encrypted';
   replacement: string;
   original: string;
   codepoints: string[];
