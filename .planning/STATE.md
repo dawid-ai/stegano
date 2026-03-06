@@ -120,9 +120,10 @@ None yet.
 | 2 | Code cleanup, JSDoc documentation, README, LICENSE, open-source package.json | 2026-02-20 | 75aadc6 | [2-code-cleanup-documentation-readme-and-op](./quick/2-code-cleanup-documentation-readme-and-op/) |
 | 3 | Auto-copy encoded text to clipboard option | 2026-02-21 | 3a4c774 | [3-create-option-to-copy-encoded-text-autom](./quick/3-create-option-to-copy-encoded-text-autom/) |
 | 4 | Remove snippet shortcuts, add context menu pasting | 2026-02-21 | 9e97109 | [4-skip-snippet-shortcuts-make-keyboard-sho](./quick/4-skip-snippet-shortcuts-make-keyboard-sho/) |
+| 5 | Fix password prefill in popup, add decrypt context menu | 2026-03-06 | cadd1e8 | [5-fix-password-prefill-in-popup-and-add-de](./quick/5-fix-password-prefill-in-popup-and-add-de/) |
 
 ## Session Continuity
 
-Last session: 2026-03-05T07:44:02Z
-Stopped at: Completed 11-01-PLAN.md -- v1.1 milestone complete
+Last session: 2026-03-06T07:24:42Z
+Stopped at: Completed quick task 5 -- password autofill fix + decrypt context menu
 Resume file: None
