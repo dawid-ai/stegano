@@ -259,29 +259,34 @@ export default defineBackground(() => {
       // If password was deleted (not found), fall back to unencrypted paste
     }
 
-    // Try sending to content script
+    // Copy to clipboard via scripting API — runs in the page context where the
+    // context menu click provides a user gesture, so clipboard access works reliably.
+    // Note: "paste at cursor" mode doesn't work from context menus because
+    // right-clicking moves focus away from the input field, so we always copy.
     try {
-      await sendMessage('insertSnippet', { content: contentToSend, mode }, tab.id);
-    } catch {
-      // Content script not loaded — inject and retry
-      try {
-        await browser.scripting.executeScript({
-          target: { tabId: tab.id },
-          files: ['/content-scripts/content.js'],
-        });
-        await sendMessage('insertSnippet', { content: contentToSend, mode }, tab.id);
-      } catch {
-        // Fallback: copy to clipboard via scripting API (restricted page)
-        try {
-          await browser.scripting.executeScript({
-            target: { tabId: tab.id },
-            func: (text: string) => navigator.clipboard.writeText(text),
-            args: [contentToSend],
+      await browser.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: (text: string, name: string) => {
+          navigator.clipboard.writeText(text).then(() => {
+            const toast = document.createElement('div');
+            toast.setAttribute('data-iu-toast', 'true');
+            toast.textContent = `Copied "${name}" to clipboard`;
+            toast.style.cssText = 'position:fixed;bottom:24px;right:24px;z-index:2147483647;' +
+              'background:#1e1e1e;color:#fff;padding:10px 18px;border-radius:8px;' +
+              'font:600 13px/1.4 system-ui,sans-serif;box-shadow:0 4px 12px rgba(0,0,0,0.4);' +
+              'border:1px solid #00BCD4;opacity:0;transition:opacity 0.2s;pointer-events:none';
+            document.body.appendChild(toast);
+            requestAnimationFrame(() => { toast.style.opacity = '1'; });
+            setTimeout(() => {
+              toast.style.opacity = '0';
+              setTimeout(() => toast.remove(), 200);
+            }, 1500);
           });
-        } catch {
-          // Restricted page — fail silently
-        }
-      }
+        },
+        args: [contentToSend, snippet.name],
+      });
+    } catch {
+      // Restricted page — fail silently
     }
   });
 

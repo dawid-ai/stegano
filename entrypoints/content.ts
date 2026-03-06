@@ -387,5 +387,25 @@ export default defineContentScript({
           .forEach(el => { el.style.backgroundColor = newColor; });
       });
     } catch { /* restricted page — no storage access */ }
+
+    // Flash input fields when invisible Unicode is pasted to confirm it worked
+    document.addEventListener('paste', (e) => {
+      const text = e.clipboardData?.getData('text') ?? '';
+      // Check for Tags block chars (U+E0001–U+E007F) — the invisible encoding we produce
+      if (!/[\u{E0001}-\u{E007F}]/u.test(text)) return;
+
+      const target = e.target as HTMLElement;
+      if (!(target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target.isContentEditable)) return;
+
+      // Brief cyan flash on the field border
+      const prev = target.style.cssText;
+      target.style.outline = '2px solid #00BCD4';
+      target.style.outlineOffset = '-1px';
+      target.style.transition = 'outline-color 0.3s';
+      setTimeout(() => {
+        target.style.outline = '2px solid transparent';
+        setTimeout(() => { target.style.cssText = prev; }, 300);
+      }, 600);
+    }, true);
   },
 });
