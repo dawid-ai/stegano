@@ -69,6 +69,7 @@ export function App() {
   const [encryptedColor, setEncryptedColor] = useState('#00BCD4');
   const [detectEncrypted, setDetectEncrypted] = useState(false);
   const [snippetPasteMode, setSnippetPasteMode] = useState<'paste' | 'copy'>('paste');
+  const [expandedInfo, setExpandedInfo] = useState<Record<string, boolean>>({});
 
   // Password management state
   const [passwords, setPasswords] = useState<SavedPassword[]>([]);
@@ -299,7 +300,7 @@ export function App() {
                 onChange={(e) => {
                   handleThemeChange((e.target as HTMLSelectElement).value as 'dark' | 'light');
                 }}
-                class="w-full max-w-xs px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                class="w-full max-w-md px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
               >
                 <option value="dark">Dark</option>
                 <option value="light">Light</option>
@@ -321,10 +322,20 @@ export function App() {
                 />
                 Auto-copy encoded text to clipboard
               </label>
+              <button
+                type="button"
+                onClick={() => setExpandedInfo(prev => ({ ...prev, autoCopy: !prev.autoCopy }))}
+                class="w-4 h-4 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-300 text-[10px] leading-none flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                title="More info"
+              >
+                ?
+              </button>
             </div>
-            <p class="text-[11px] text-gray-400 dark:text-gray-500 -mt-2">
-              When enabled, clicking Encode in the popup will automatically copy the invisible text to your clipboard.
-            </p>
+            {expandedInfo.autoCopy && (
+              <p class="text-[11px] text-gray-400 dark:text-gray-500 -mt-2 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700">
+                When enabled, the encoded invisible text is automatically copied to your clipboard after encoding, so you can paste it directly.
+              </p>
+            )}
 
             {/* Auto-detect Encrypted Content */}
             <div class="flex items-center gap-3">
@@ -341,14 +352,34 @@ export function App() {
                 />
                 Auto-detect encrypted hidden text during scans
               </label>
+              <button
+                type="button"
+                onClick={() => setExpandedInfo(prev => ({ ...prev, detectEncrypted: !prev.detectEncrypted }))}
+                class="w-4 h-4 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-300 text-[10px] leading-none flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                title="More info"
+              >
+                ?
+              </button>
             </div>
-            <p class="text-[11px] text-gray-400 dark:text-gray-500 -mt-2">
-              When enabled, the scanner will identify encrypted content (ENC1: marker) and highlight it with a distinct color and [Encrypted] label.
-            </p>
+            {expandedInfo.detectEncrypted && (
+              <p class="text-[11px] text-gray-400 dark:text-gray-500 -mt-2 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700">
+                When enabled, scans will identify and highlight encrypted hidden text (ENC1: prefix) separately with a distinct color, allowing one-click decryption.
+              </p>
+            )}
 
             {/* Context Menu Snippet Behavior */}
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Context Menu Snippet Behavior</label>
+              <div class="flex items-center gap-1.5">
+                <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Context Menu Snippet Behavior</label>
+                <button
+                  type="button"
+                  onClick={() => setExpandedInfo(prev => ({ ...prev, pasteMode: !prev.pasteMode }))}
+                  class="w-4 h-4 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-300 text-[10px] leading-none flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                  title="More info"
+                >
+                  ?
+                </button>
+              </div>
               <select
                 value={snippetPasteMode}
                 onChange={(e) => {
@@ -356,19 +387,31 @@ export function App() {
                   setSnippetPasteMode(val);
                   void snippetPasteModeSetting.setValue(val);
                 }}
-                class="w-full max-w-xs px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                class="w-full max-w-md px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
               >
                 <option value="paste">Paste at cursor -- inserts snippet text directly where your cursor is</option>
                 <option value="copy">Copy to clipboard -- copies snippet for manual pasting</option>
               </select>
-              <p class="text-[11px] text-gray-400 dark:text-gray-500">
-                Right-click on any page to access your saved snippets from the context menu.
-              </p>
+              {expandedInfo.pasteMode && (
+                <p class="text-[11px] text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700">
+                  Paste at cursor inserts the invisible text directly into the focused input field. Copy to clipboard puts it on your clipboard instead.
+                </p>
+              )}
             </div>
 
             {/* Scan Mode */}
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Scan Mode</label>
+              <div class="flex items-center gap-1.5">
+                <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Scan Mode</label>
+                <button
+                  type="button"
+                  onClick={() => setExpandedInfo(prev => ({ ...prev, scanMode: !prev.scanMode }))}
+                  class="w-4 h-4 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-300 text-[10px] leading-none flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                  title="More info"
+                >
+                  ?
+                </button>
+              </div>
               <select
                 value={scanMode}
                 onChange={(e) => {
@@ -376,19 +419,31 @@ export function App() {
                   setScanMode(val);
                   void scanModeSetting.setValue(val);
                 }}
-                class="w-full max-w-xs px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                class="w-full max-w-md px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
               >
                 <option value="onDemand">On-demand -- scan when you click the button</option>
                 <option value="auto">Automatic -- scan every page on load</option>
               </select>
-              <p class="text-[11px] text-gray-400 dark:text-gray-500">
-                Auto mode requires the extension to have host permissions. You may be prompted to grant access.
-              </p>
+              {expandedInfo.scanMode && (
+                <p class="text-[11px] text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700">
+                  On-demand scans only when you click the scan button or use keyboard shortcut. Auto mode scans every page automatically when it loads -- useful for always-on protection but uses more resources.
+                </p>
+              )}
             </div>
 
             {/* Sensitivity Level */}
             <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Detection Sensitivity</label>
+              <div class="flex items-center gap-1.5">
+                <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Detection Sensitivity</label>
+                <button
+                  type="button"
+                  onClick={() => setExpandedInfo(prev => ({ ...prev, sensitivity: !prev.sensitivity }))}
+                  class="w-4 h-4 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-300 text-[10px] leading-none flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                  title="More info"
+                >
+                  ?
+                </button>
+              </div>
               <select
                 value={sensitivity}
                 onChange={(e) => {
@@ -396,17 +451,32 @@ export function App() {
                   setSensitivity(val);
                   void sensitivitySetting.setValue(val);
                 }}
-                class="w-full max-w-xs px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
+                class="w-full max-w-md px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100"
               >
                 <option value="standard">Standard -- Tags block, zero-width, AI watermarks</option>
                 <option value="thorough">Thorough -- adds invisible operators, variation selectors</option>
                 <option value="paranoid">Paranoid -- adds directional overrides, soft hyphens, all invisible chars</option>
               </select>
+              {expandedInfo.sensitivity && (
+                <p class="text-[11px] text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700">
+                  Standard catches common invisible characters (zero-width, Tags block). Strict adds more Unicode categories. Paranoid flags everything unusual -- may have false positives on some languages.
+                </p>
+              )}
             </div>
 
             {/* Per-class Highlight Colors */}
             <div class="flex flex-col gap-3">
-              <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Highlight Colors</label>
+              <div class="flex items-center gap-1.5">
+                <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Highlight Colors</label>
+                <button
+                  type="button"
+                  onClick={() => setExpandedInfo(prev => ({ ...prev, colors: !prev.colors }))}
+                  class="w-4 h-4 rounded-full bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-300 text-[10px] leading-none flex items-center justify-center hover:bg-gray-300 dark:hover:bg-gray-500 transition-colors"
+                  title="More info"
+                >
+                  ?
+                </button>
+              </div>
 
               {/* Tags Block Color */}
               <div class="flex items-center gap-3">
@@ -516,20 +586,22 @@ export function App() {
                 </div>
               </div>
 
-              <p class="text-[11px] text-gray-400 dark:text-gray-500">
-                Customize highlight colors per character class: yellow for Tags block, orange for zero-width, pink for AI watermarks, cyan for encrypted.
-              </p>
+              {expandedInfo.colors && (
+                <p class="text-[11px] text-gray-400 dark:text-gray-500 bg-gray-50 dark:bg-gray-800 px-3 py-2 rounded-md border border-gray-200 dark:border-gray-700">
+                  Customize the highlight colors for each type of invisible character found during scans.
+                </p>
+              )}
             </div>
 
             {/* Keyboard Shortcuts Reference */}
             <div class="flex flex-col gap-1.5">
               <label class="text-xs font-medium text-gray-600 dark:text-gray-400">Keyboard Shortcuts</label>
               <div class="text-xs text-gray-600 dark:text-gray-400 space-y-1">
-                <div class="flex justify-between max-w-xs">
+                <div class="flex justify-between max-w-md">
                   <span>Open popup</span>
                   <kbd class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-[11px]">Ctrl+Shift+U</kbd>
                 </div>
-                <div class="flex justify-between max-w-xs">
+                <div class="flex justify-between max-w-md">
                   <span>Toggle scan</span>
                   <kbd class="px-1.5 py-0.5 bg-gray-100 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded text-[11px]">Alt+Shift+S</kbd>
                 </div>
