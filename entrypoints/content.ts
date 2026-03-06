@@ -11,10 +11,10 @@
  * a startScan message (WXT requires matches for content scripts).
  */
 
-import { onMessage } from '@/utils/messaging';
+import { onMessage, sendMessage } from '@/utils/messaging';
 import { findInvisibleChars, type ScanFinding } from '@/utils/scanner';
 import { tagsColorSetting, zerowColorSetting, watermarkColorSetting, encryptedColorSetting, detectEncryptedSetting, sensitivitySetting, scanModeSetting } from '@/utils/storage';
-import { attachEncryptedClickHandlers } from './content/decrypt-prompt';
+import { attachEncryptedClickHandlers, showInlineDecryptPrompt } from './content/decrypt-prompt';
 
 /** Tags to skip when walking the DOM */
 const SKIP_TAGS = new Set([
@@ -264,8 +264,27 @@ async function performFullScan(): Promise<{ count: number }> {
 export default defineContentScript({
   matches: ['<all_urls>'],
   main() {
+    // Track the last right-clicked highlight span for context menu decrypt
+    let lastRightClickedHighlight: HTMLElement | null = null;
+
+    document.addEventListener('mousedown', (e) => {
+      if (e.button === 2) { // right-click
+        const target = e.target as HTMLElement;
+        const highlight = target.closest('[data-iu-highlight]') as HTMLElement | null;
+        lastRightClickedHighlight = highlight;
+      }
+    }, true);
+
     // Health check — verify content script is injected and responsive
     onMessage('ping', () => 'pong' as const);
+
+    // Handle decrypt context menu — show inline decrypt prompt on right-clicked highlight
+    onMessage('showDecryptPrompt', () => {
+      if (!lastRightClickedHighlight) return false;
+      showInlineDecryptPrompt(lastRightClickedHighlight);
+      lastRightClickedHighlight = null;
+      return true;
+    });
 
     // Handle snippet insertion from context menu
     onMessage('insertSnippet', async ({ content, mode }) => {
@@ -338,9 +357,11 @@ export default defineContentScript({
     });
 
     // Auto-scan on page load if scan mode is 'auto' (SCAN-07)
-    scanModeSetting.getValue().then((mode) => {
+    scanModeSetting.getValue().then(async (mode) => {
       if (mode === 'auto') {
-        performFullScan().catch(() => {});
+        const result = await performFullScan();
+        // Report results to background so badge updates
+        sendMessage('autoScanResult', { count: result.count }).catch(() => {});
       }
     }).catch(() => { /* restricted page — no storage access */ });
 

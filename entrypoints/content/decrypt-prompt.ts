@@ -127,7 +127,7 @@ export function attachEncryptedClickHandlers(): void {
 // Internal: show inline decrypt prompt
 // ---------------------------------------------------------------------------
 
-function showInlineDecryptPrompt(anchorSpan: HTMLElement): void {
+export function showInlineDecryptPrompt(anchorSpan: HTMLElement): void {
   // Close any existing prompt
   document
     .querySelectorAll('[data-iu-decrypt-prompt]')

@@ -100,6 +100,14 @@ async function handleScanToggle(tabId: number, url: string | undefined): Promise
  */
 async function buildSnippetMenus(): Promise<void> {
   await browser.contextMenus.removeAll();
+
+  // Always create the Decrypt context menu item
+  browser.contextMenus.create({
+    id: 'stegano-decrypt',
+    title: 'Stegano - Decrypt',
+    contexts: ['all'],
+  });
+
   const snippets = await snippetsSetting.getValue();
   if (snippets.length === 0) return;
 
@@ -170,6 +178,18 @@ export default defineBackground(() => {
   // Handle context menu clicks for snippet paste/copy
   browser.contextMenus.onClicked.addListener(async (info, tab) => {
     const menuId = String(info.menuItemId);
+
+    // Handle Decrypt context menu item
+    if (menuId === 'stegano-decrypt') {
+      if (!tab?.id) return;
+      try {
+        await sendMessage('showDecryptPrompt', undefined, tab.id);
+      } catch {
+        // Content script not loaded — ignore
+      }
+      return;
+    }
+
     if (!menuId.startsWith('stegano-snippet-')) return;
 
     const snippetId = menuId.replace('stegano-snippet-', '');
@@ -214,6 +234,14 @@ export default defineBackground(() => {
           // Restricted page — fail silently
         }
       }
+    }
+  });
+
+  // Handle auto-scan results from content script (badge update)
+  onMessage('autoScanResult', async ({ count }) => {
+    const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
+    if (tab?.id) {
+      updateBadge(tab.id, count);
     }
   });
 
