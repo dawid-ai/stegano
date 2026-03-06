@@ -318,6 +318,8 @@ export function App() {
             value={password}
             onInput={(e) => setPassword((e.target as HTMLInputElement).value)}
             placeholder="Password (optional — enables encryption)"
+            name="stegano-encode-pw"
+            autocomplete="new-password"
             class="w-full px-3 py-1.5 pr-16 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
           />
           <button
@@ -429,6 +431,8 @@ export function App() {
                 }}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleDecrypt(); }}
                 placeholder="Enter password"
+                name="stegano-decrypt-pw"
+                autocomplete="new-password"
                 class="w-full px-3 py-1.5 pr-16 border border-amber-300 dark:border-amber-700 rounded-md text-sm bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:border-transparent"
               />
               <button

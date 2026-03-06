@@ -220,4 +220,4 @@ Note: Phases 9 and 10 can be parallelized (Phase 9 depends on Phase 7 only; Phas
 | 8. Popup Encrypt/Decrypt UI | v1.1 | 2/2 | Complete | 2026-03-05 |
 | 9. Scanner Integration | v1.1 | 2/2 | Complete | 2026-03-05 |
 | 10. Password Management | v1.1 | 2/2 | Complete | 2026-03-05 |
-| 11. Inline Decryption | v1.1 | 1/1 | Complete | 2026-03-05 |
+| 11. Inline Decryption | v1.1 | Complete    | 2026-03-05 | 2026-03-05 |
