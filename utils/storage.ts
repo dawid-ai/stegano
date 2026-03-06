@@ -73,7 +73,7 @@ export const watermarkColorSetting = storage.defineItem<string>(
 /** Whether to automatically copy encoded text to clipboard after encoding */
 export const autoCopyOnEncodeSetting = storage.defineItem<boolean>(
   'sync:autoCopyOnEncode',
-  { fallback: false },
+  { fallback: true },
 );
 
 /** Scan mode: on-demand (user clicks scan) or auto (scan on page load) */
@@ -97,7 +97,7 @@ export const snippetPasteModeSetting = storage.defineItem<'paste' | 'copy'>(
 /** Whether to detect encrypted content (ENC1: prefix) within Tags runs */
 export const detectEncryptedSetting = storage.defineItem<boolean>(
   'sync:detectEncrypted',
-  { fallback: false },
+  { fallback: true },
 );
 
 /** Per-class highlight color for encrypted content findings */

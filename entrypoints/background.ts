@@ -12,9 +12,27 @@
 
 import { browser } from 'wxt/browser';
 import { onMessage, sendMessage } from '@/utils/messaging';
-import { scanModeSetting, snippetsSetting, snippetPasteModeSetting, passwordsSetting } from '@/utils/storage';
+import { scanModeSetting, snippetsSetting, snippetPasteModeSetting, passwordsSetting, addPassword, addSnippet } from '@/utils/storage';
 import { encryptToInvisible } from '@/utils/crypto';
-import { decode } from '@/utils/codec';
+import { encode, decode } from '@/utils/codec';
+
+/** Per-tab scan state: tracks which tabs have active scans */
+const tabScanState = new Map<number, boolean>();
+
+/**
+ * Update the scan context menu item title based on whether the tab has an active scan.
+ */
+function updateScanMenuItem(tabId: number): void {
+  try {
+    browser.contextMenus.update('stegano-scan-toggle', {
+      title: tabScanState.has(tabId)
+        ? 'Stegano - Clear Scan Highlights'
+        : 'Stegano - Scan Page for Hidden Characters',
+    });
+  } catch {
+    // Menu may not exist yet during startup
+  }
+}
 
 /** URLs where content script injection is not allowed */
 const RESTRICTED_PREFIXES = ['chrome://', 'about:', 'chrome-extension://'];
@@ -72,6 +90,8 @@ async function handleScanToggle(tabId: number, url: string | undefined): Promise
       // Content script may have been unloaded — ignore
     }
     await browser.action.setBadgeText({ text: '', tabId });
+    tabScanState.delete(tabId);
+    updateScanMenuItem(tabId);
   } else {
     // No scan active — toggle ON
     try {
@@ -88,6 +108,8 @@ async function handleScanToggle(tabId: number, url: string | undefined): Promise
     try {
       const result = await sendMessage('startScan', undefined, tabId);
       updateBadge(tabId, result.count);
+      tabScanState.set(tabId, true);
+      updateScanMenuItem(tabId);
     } catch (err) {
       console.error('Stegano: scan failed', err);
     }
@@ -100,6 +122,13 @@ async function handleScanToggle(tabId: number, url: string | undefined): Promise
  */
 async function buildSnippetMenus(): Promise<void> {
   await browser.contextMenus.removeAll();
+
+  // Scan toggle — always first in the context menu
+  browser.contextMenus.create({
+    id: 'stegano-scan-toggle',
+    title: 'Stegano - Scan Page for Hidden Characters',
+    contexts: ['all'],
+  });
 
   // Always create the Decrypt context menu item
   browser.contextMenus.create({
@@ -163,11 +192,23 @@ export default defineBackground(() => {
     }
   });
 
-  // Build context menus and confirm storage on install
-  browser.runtime.onInstalled.addListener(async () => {
+  // Build context menus and confirm storage on install; seed demo content on fresh install
+  browser.runtime.onInstalled.addListener(async (details) => {
     const mode = await scanModeSetting.getValue();
     void mode; // Confirm storage is accessible from service worker on install
     await buildSnippetMenus();
+
+    // Create demo content only on fresh install
+    if (details.reason === 'install') {
+      const existingSnippets = await snippetsSetting.getValue();
+      const existingPasswords = await passwordsSetting.getValue();
+      if (existingSnippets.length === 0 && existingPasswords.length === 0) {
+        await addPassword({ id: 'default-pw', name: 'Stegano Default Password', password: 'SteGan0 RuLe5' });
+        await addSnippet({ id: 'demo-plain', name: 'Not Encrypted', content: encode(' This is a hidden text. ') });
+        const encryptedContent = await encryptToInvisible(' This is a hidden and encrypted text. ', 'SteGan0 RuLe5');
+        await addSnippet({ id: 'demo-encrypted', name: 'Encrypted', content: encryptedContent, passwordId: 'default-pw' });
+      }
+    }
   });
 
   // Rebuild context menus when snippets change
@@ -178,6 +219,13 @@ export default defineBackground(() => {
   // Handle context menu clicks for snippet paste/copy
   browser.contextMenus.onClicked.addListener(async (info, tab) => {
     const menuId = String(info.menuItemId);
+
+    // Handle Scan toggle context menu item
+    if (menuId === 'stegano-scan-toggle') {
+      if (!tab?.id) return;
+      await handleScanToggle(tab.id, tab.url);
+      return;
+    }
 
     // Handle Decrypt context menu item
     if (menuId === 'stegano-decrypt') {
@@ -245,10 +293,17 @@ export default defineBackground(() => {
     }
   });
 
-  // Clear badge when tab navigates to a new page
+  // Clear badge and scan state when tab navigates to a new page
   browser.tabs.onUpdated.addListener((tabId, changeInfo) => {
     if (changeInfo.status === 'loading') {
       void browser.action.setBadgeText({ text: '', tabId });
+      tabScanState.delete(tabId);
+      updateScanMenuItem(tabId);
     }
+  });
+
+  // Update context menu title when switching tabs
+  browser.tabs.onActivated.addListener(({ tabId }) => {
+    updateScanMenuItem(tabId);
   });
 });
