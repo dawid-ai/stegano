@@ -121,9 +121,10 @@ None yet.
 | 3 | Auto-copy encoded text to clipboard option | 2026-02-21 | 3a4c774 | [3-create-option-to-copy-encoded-text-autom](./quick/3-create-option-to-copy-encoded-text-autom/) |
 | 4 | Remove snippet shortcuts, add context menu pasting | 2026-02-21 | 9e97109 | [4-skip-snippet-shortcuts-make-keyboard-sho](./quick/4-skip-snippet-shortcuts-make-keyboard-sho/) |
 | 5 | Fix password prefill in popup, add decrypt context menu | 2026-03-06 | cadd1e8 | [5-fix-password-prefill-in-popup-and-add-de](./quick/5-fix-password-prefill-in-popup-and-add-de/) |
+| 6 | Scan toggle context menu, demo content on install, settings UX | 2026-03-06 | 40e3163 | [6-add-scan-toggle-context-menu-set-default](./quick/6-add-scan-toggle-context-menu-set-default/) |
 
 ## Session Continuity
 
-Last session: 2026-03-06T07:24:42Z
-Stopped at: Completed quick task 5 -- password autofill fix + decrypt context menu
+Last session: 2026-03-06T10:02:39Z
+Stopped at: Completed quick task 6 -- scan context menu + demo content + settings info toggles
 Resume file: None
