@@ -42,7 +42,7 @@ const PROMPT_STYLES = `
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
-input[type="password"] {
+input[type="text"] {
   background: #2a2a2a;
   color: #fff;
   border: 1px solid #555;
@@ -52,9 +52,10 @@ input[type="password"] {
   outline: none;
   width: 100%;
   box-sizing: border-box;
+  -webkit-text-security: disc;
 }
 
-input[type="password"]:focus {
+input[type="text"]:focus {
   border-color: #888;
 }
 
@@ -164,8 +165,11 @@ export function showInlineDecryptPrompt(anchorSpan: HTMLElement): void {
 
   // Password input
   const input = document.createElement('input');
-  input.type = 'password';
+  input.type = 'text';
   input.placeholder = 'Enter password';
+  input.autocomplete = 'off';
+  input.name = 'stegano-inline-decrypt-pw';
+  input.style.webkitTextSecurity = 'disc';
   wrapper.appendChild(input);
 
   // Decrypt button

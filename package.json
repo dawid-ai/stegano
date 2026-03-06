@@ -1,8 +1,8 @@
 {
   "name": "stegano",
-  "description": "AI Red Team tool - hide and detect invisible Unicode on any web page. Test prompt injection, find ASCII smuggling, reveal hidden text",
+  "description": "AI Red Team tool - hide, encrypt & detect invisible Unicode on any web page. Test prompt injection, find ASCII smuggling, reveal hidden text",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.5.0",
   "type": "module",
   "author": "Dawid Jozwiak (https://dawid.ai)",
   "license": "MIT",

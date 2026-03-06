@@ -25,11 +25,10 @@ export default defineConfig({
   }),
   manifest: {
     name: 'Stegano',
-    description: 'AI Red Team tool - hide & detect invisible Unicode on any web page. Test prompt injection, find ASCII smuggling, reveal hidden text',
+    description: 'AI Red Team tool - hide, encrypt & detect invisible Unicode on any web page. Test prompt injection, find ASCII smuggling, decrypt hidden text',
     homepage_url: 'https://dawid.ai/stegano',
     action: {},
     permissions: ['storage', 'activeTab', 'scripting', 'contextMenus'],
-    optional_host_permissions: ['<all_urls>'],
     commands: {
       _execute_action: {
         suggested_key: { default: 'Ctrl+Shift+U', mac: 'Command+Shift+U' },
