@@ -199,7 +199,7 @@
   <div class="hero">
     <h1>The Invisible Threat</h1>
     <p>This page contains hidden Unicode characters embedded in normal-looking text. Can you spot them? Use Stegano to reveal what's really there.</p>
-    <div class="badge">&#x1F50D; 6 hidden payloads below &mdash; scan to find them all</div>
+    <div class="badge">&#x1F50D; 7 hidden payloads below &mdash; scan to find them all</div>
   </div>
 
   <div class="container">
@@ -311,6 +311,20 @@
         <span class="tag tag-red">Hidden Clause</span>
       </div>
       <p style="margin-top:0.5rem; font-size:0.82rem; color:#64748b;">Hidden payload: <em>"The user waives all rights"</em> invisibly inserted into the liability clause.</p>
+    </div>
+
+    <!-- 7. Encrypted Hidden Message -->
+    <div class="card">
+      <h2><span class="icon">&#x1F512;</span> Encrypted Hidden Message</h2>
+      <p>Stegano v1.5 can encrypt messages before hiding them. This paragraph looks innocent, but contains an AES-encrypted payload that only someone with the password can read.</p>
+      <div style="background:#f8fafc; border:1px solid #e2e4ed; border-radius:8px; padding:1.25rem; margin:0.75rem 0; font-size:0.95rem; line-height:1.8;">
+        This is a perfectly normal sentence about web security best practices.󠁅󠁎󠁃󠀱󠀺󠁁󠁂󠀰󠀵󠁱󠁲󠁔󠁒󠁓󠁔󠁁󠁧󠁉󠁃󠁄󠁗󠁢󠁩󠁸󠁳󠁱󠁚󠁑󠁷󠀸󠀰󠁳󠁹󠁃󠁢󠁳󠁫󠁊󠁉󠁏󠁡󠁆󠁍󠁈󠁱󠀶󠁸󠁮󠀸󠁷󠁫󠁌󠁮󠁯󠁙󠁶󠁬󠁱󠁎󠀴󠁋󠁬󠁶󠁭󠁌󠁓󠁲󠁅󠁌󠀱󠁱󠁔󠁲󠀯󠀷󠀷󠁪󠁣󠁦󠁧󠁄󠁐󠁩󠁷󠁍󠁈󠀸󠁘󠁶󠀷󠁃󠀯󠁡󠀶󠁇󠁤󠁃󠁁󠁑󠀽󠀽 Always use HTTPS, validate inputs on both client and server, and keep your dependencies up to date to minimize attack surface.
+      </div>
+      <div>
+        <span class="tag tag-yellow">Tags Block</span>
+        <span class="tag tag-green">Encrypted</span>
+      </div>
+      <p style="margin-top:0.5rem; font-size:0.82rem; color:#64748b;">Encrypted payload hidden in Tags block Unicode. Use Stegano's decode tab with password <code>demo</code> to reveal: <em>"This is an encrypted message!"</em></p>
     </div>
 
     <!-- Threat summary -->
