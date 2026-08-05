@@ -99,7 +99,7 @@ All processing is local-only. The extension makes no network calls, collects no 
 ## Links
 
 - Blog post: [dawid.ai/stegano](https://dawid.ai/stegano)
-- Author: [Dawid Jozwiak](https://www.linkedin.com/in/jozwiakdawid/) on LinkedIn
+- Author: [Dawid Jozwiak](https://www.linkedin.com/in/dawid-ai/)
 
 ## License
 
